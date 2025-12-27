@@ -1,343 +1,299 @@
-/* Reset y base - Mobile First */
+/* RESET Y BASE - MOBILE FIRST */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    text-size-adjust: 100%;
 }
 
-html {
-    font-size: 16px;
+html, body {
+    width: 100%;
     height: 100%;
     overflow: hidden;
-}
-
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
     color: #2C2C2C;
-    overflow: hidden;
-    height: 100vh;
-    height: -webkit-fill-available;
-    width: 100vw;
     position: fixed;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    touch-action: manipulation;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
-/* Container responsivo */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-/* Tipografía responsiva */
-h1, h2, h3, h4 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 500;
-    line-height: 1.2;
-}
-
-h1 { 
-    font-size: clamp(1.8rem, 5vw, 2.5rem); 
-}
-
-h2 { 
-    font-size: clamp(1.2rem, 3.5vw, 1.8rem); 
-}
-
-h3 { 
-    font-size: clamp(1.1rem, 3vw, 1.4rem); 
-}
-
-h4 { 
-    font-size: clamp(1rem, 2.8vw, 1.2rem); 
-}
-
-p, li {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-/* Pantallas */
+/* PANTALLAS */
 .pantalla {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    height: -webkit-fill-available;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: none;
+    display: none;
 }
 
 .pantalla.activa {
-    opacity: 1;
-    pointer-events: all;
+    display: block;
 }
 
-/* Pantalla de inicio */
+/* PANTALLA INICIO */
 #inicio {
+    background: #fff;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    min-height: -webkit-fill-available;
-    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+    padding: 20px 15px;
 }
 
 .cabecera {
-    padding: max(1.5rem, env(safe-area-inset-top)) 0 1.5rem;
     text-align: center;
-    flex-shrink: 0;
+    margin-bottom: 25px;
+    padding-top: 10px;
 }
 
 .titulo-artista {
-    margin-bottom: 0.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 500;
     color: #2C2C2C;
-    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    line-height: 1.2;
 }
 
 .subtitulo {
-    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-    font-weight: 400;
+    font-size: 14px;
     color: #666;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    font-weight: 400;
 }
 
 .contenido-inicio {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 1rem 0;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .descripcion {
-    margin-bottom: 2rem;
+    flex: 1;
 }
 
 .texto-descripcion {
-    font-size: clamp(1rem, 3vw, 1.2rem);
-    color: #444;
-    margin-bottom: 2rem;
-    text-align: center;
+    font-size: 16px;
     line-height: 1.5;
+    color: #444;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* GALERIA DE IMAGENES */
+.galeria-imagenes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.imagen-container {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.imagen-galeria {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .instrucciones {
-    background: #F8F8F8;
+    background: #f8f8f8;
     border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 2rem;
-    border: 1px solid #EAEAEA;
+    padding: 20px;
+    margin-bottom: 25px;
 }
 
 .instrucciones-titulo {
-    margin-bottom: 0.75rem;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
     color: #2C2C2C;
 }
 
 .instrucciones-lista {
-    list-style-position: inside;
+    padding-left: 20px;
     color: #666;
-    padding-left: 0.5rem;
 }
 
 .instrucciones-lista li {
-    margin-bottom: 0.5rem;
-    line-height: 1.5;
-    padding-left: 0.5rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
 .info-obra-seleccionada {
     text-align: center;
-    padding: 1.25rem;
-    border-top: 1px solid #EAEAEA;
-    margin-top: 1rem;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    margin-bottom: 25px;
 }
 
 .titulo-obra {
-    margin-bottom: 0.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
     color: #2C2C2C;
 }
 
 .detalles-obra {
+    font-size: 13px;
     color: #888;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-    margin-bottom: 1rem;
+    margin-bottom: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .texto-curatorial {
-    font-style: italic;
+    font-size: 14px;
+    line-height: 1.5;
     color: #666;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-style: italic;
 }
 
-/* Controles */
+/* CONTROLES */
 .controles-inicio {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    width: 100%;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .btn-primario, .btn-secundario, .btn-volver, .btn-control {
     border: none;
-    padding: clamp(1rem, 3vw, 1.2rem) clamp(1.5rem, 4vw, 2rem);
-    font-size: clamp(1rem, 2.8vw, 1.1rem);
+    padding: 16px 24px;
+    font-size: 16px;
     border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 8px;
     width: 100%;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
 }
 
 .btn-primario {
     background: #2C2C2C;
     color: white;
-    box-shadow: 0 2px 8px rgba(44, 44, 44, 0.1);
 }
 
 .btn-primario:active {
-    background: #1A1A1A;
-    transform: translateY(1px);
-    box-shadow: 0 1px 4px rgba(44, 44, 44, 0.1);
+    background: #1a1a1a;
+    transform: scale(0.98);
 }
 
 .btn-secundario {
     background: transparent;
     color: #2C2C2C;
-    border: 2px solid #EAEAEA;
+    border: 2px solid #e0e0e0;
 }
 
 .btn-secundario:active {
-    border-color: #2C2C2C;
-    background: #F8F8F8;
+    background: #f8f8f8;
 }
 
-.btn-texto-movil {
-    display: none;
-}
-
-/* Footer */
+/* FOOTER */
 .pie-inicio {
     text-align: center;
-    padding: 1.25rem 0;
-    border-top: 1px solid #EAEAEA;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
     margin-top: auto;
-    flex-shrink: 0;
 }
 
 .leyenda {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-size: 13px;
     color: #888;
-    margin-bottom: 0.5rem;
+    margin-bottom: 6px;
     font-style: italic;
 }
 
 .creditos {
-    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-    color: #AAA;
+    font-size: 12px;
+    color: #aaa;
 }
 
-/* Contenedor AR */
+/* PANTALLA AR */
 #contenedor-ar {
     background: #000;
-    height: 100vh;
-    height: -webkit-fill-available;
 }
 
-.ar-scene {
+.a-scene {
     width: 100%;
     height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
-/* Overlay AR */
+/* OVERLAY AR */
 .ar-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
+    padding: 15px;
     pointer-events: none;
-    padding-top: env(safe-area-inset-top);
 }
 
 .ar-overlay > * {
-    pointer-events: all;
+    pointer-events: auto;
 }
 
 .ar-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 0 0 16px 16px;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    gap: 12px;
+    align-items: center;
 }
 
 .btn-volver {
-    background: rgba(44, 44, 44, 0.08);
+    background: rgba(44, 44, 44, 0.1);
     color: #2C2C2C;
-    padding: 0.7rem 1.25rem;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-    white-space: nowrap;
+    padding: 10px 16px;
+    font-size: 14px;
     flex-shrink: 0;
-    min-width: min-content;
-}
-
-.btn-volver:active {
-    background: rgba(44, 44, 44, 0.15);
 }
 
 .info-obra-ar {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
 }
 
 #titulo-obra-ar {
-    font-size: clamp(1rem, 3vw, 1.3rem);
-    margin-bottom: 0.2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 #detalles-obra-ar {
+    font-size: 12px;
     color: #888;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -345,59 +301,45 @@ p, li {
 
 .ar-controles {
     display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
+    gap: 8px;
     width: 100%;
     justify-content: center;
-    order: 3;
+    order: 1;
 }
 
 .btn-control {
-    background: rgba(44, 44, 44, 0.08);
+    background: rgba(44, 44, 44, 0.1);
     color: #2C2C2C;
-    padding: 0.7rem;
-    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+    padding: 10px 16px;
+    font-size: 14px;
     flex: 1;
-    min-width: 0;
-    max-width: 33%;
-}
-
-.btn-control .btn-icono {
-    font-size: 1.2em;
 }
 
 .btn-control:active {
-    background: rgba(44, 44, 44, 0.15);
+    background: rgba(44, 44, 44, 0.2);
 }
 
-.btn-control.activo {
-    background: #2C2C2C;
-    color: white;
-}
-
-/* Instrucciones AR */
 .ar-instrucciones {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 0.875rem 1rem;
+    padding: 15px;
     border-radius: 16px;
     text-align: center;
-    max-width: 500px;
+    max-width: 400px;
     margin: 0 auto;
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 #texto-instrucciones {
-    margin-bottom: 0.75rem;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-size: 14px;
+    margin-bottom: 12px;
     line-height: 1.4;
 }
 
 .indicador-carga {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 6px;
 }
 
 .punto-carga {
@@ -406,142 +348,155 @@ p, li {
     background: #C4A35A;
     border-radius: 50%;
     opacity: 0.3;
-    animation: pulso 1.5s infinite ease-in-out;
+    animation: pulso 1.5s infinite;
 }
 
 .punto-carga:nth-child(2) { animation-delay: 0.2s; }
 .punto-carga:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes pulso {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
 }
 
-/* Modal */
+/* MODAL */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    height: -webkit-fill-available;
     background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: flex-start;
+    display: none;
+    align-items: center;
     justify-content: center;
     z-index: 2000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    padding: env(safe-area-inset-top) 1rem 1rem;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    padding: 20px;
 }
 
 .modal[aria-hidden="false"] {
-    opacity: 1;
-    pointer-events: all;
+    display: flex;
 }
 
 .modal-contenido {
     background: white;
     border-radius: 20px;
-    padding: 1.5rem;
-    width: 100%;
+    padding: 25px;
     max-width: 500px;
-    max-height: 85vh;
+    width: 100%;
+    max-height: 80vh;
     overflow-y: auto;
     position: relative;
-    margin-top: auto;
-    margin-bottom: auto;
 }
 
 .btn-cerrar-modal {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 15px;
+    right: 15px;
     background: none;
     border: none;
-    font-size: 1.75rem;
+    font-size: 24px;
     color: #666;
-    cursor: pointer;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
     border-radius: 50%;
-    touch-action: manipulation;
 }
 
 .btn-cerrar-modal:active {
-    background: #F8F8F8;
-    color: #2C2C2C;
+    background: #f8f8f8;
 }
 
 .modal-titulo {
-    margin-bottom: 1.25rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
     color: #2C2C2C;
-    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
 }
 
 .modal-texto {
     color: #444;
+    line-height: 1.5;
+}
+
+.modal-texto h3 {
+    margin: 20px 0 10px;
+    font-size: 16px;
 }
 
 .modal-texto ul {
-    margin: 1rem 0 1rem 1.25rem;
+    margin-left: 20px;
+    margin-bottom: 20px;
     color: #666;
 }
 
 .modal-texto li {
-    margin-bottom: 0.5rem;
-    padding-left: 0.25rem;
+    margin-bottom: 8px;
 }
 
 .contacto {
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid #EAEAEA;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 }
 
 .contacto h4 {
-    margin-bottom: 0.5rem;
-    color: #2C2C2C;
-    font-size: clamp(1rem, 2.8vw, 1.1rem);
+    margin-bottom: 10px;
+    font-size: 16px;
 }
 
 .contacto p {
     color: #666;
-    margin-bottom: 0.25rem;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    margin-bottom: 5px;
 }
 
-/* Media Queries - Responsive Design */
+/* MEDIA QUERIES - RESPONSIVE */
 
-/* Tablets en vertical (≥ 600px) */
+/* Tablets pequeñas (≥ 480px) */
+@media (min-width: 480px) {
+    #inicio {
+        padding: 25px 20px;
+    }
+    
+    .titulo-artista {
+        font-size: 32px;
+    }
+    
+    .imagen-container {
+        height: 220px;
+    }
+    
+    .galeria-imagenes {
+        gap: 20px;
+    }
+}
+
+/* Tablets (≥ 600px) */
 @media (min-width: 600px) {
-    .container {
-        padding: 0 1.5rem;
-    }
-    
-    .cabecera {
-        padding: max(2rem, env(safe-area-inset-top)) 0 2rem;
-    }
-    
     .contenido-inicio {
-        padding: 1.5rem 0;
+        max-width: 550px;
     }
     
-    .instrucciones {
-        padding: 1.5rem;
+    .titulo-artista {
+        font-size: 36px;
+    }
+    
+    .galeria-imagenes {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .imagen-container {
+        flex: 1;
+        min-width: calc(50% - 10px);
+        height: 180px;
     }
     
     .controles-inicio {
         flex-direction: row;
-        gap: 1rem;
     }
     
     .btn-primario, .btn-secundario {
@@ -551,7 +506,6 @@ p, li {
     
     .ar-header {
         flex-wrap: nowrap;
-        gap: 1rem;
     }
     
     .ar-controles {
@@ -561,179 +515,159 @@ p, li {
     
     .btn-control {
         flex: 0 0 auto;
-        max-width: none;
-        padding: 0.7rem 1rem;
-    }
-    
-    .btn-texto-movil {
-        display: inline;
     }
 }
 
-/* Tablets en horizontal (≥ 768px) */
+/* Tablets grandes (≥ 768px) */
 @media (min-width: 768px) {
-    html {
-        font-size: 17px;
-    }
-    
-    .container {
-        padding: 0 2rem;
+    #inicio {
+        padding: 30px;
     }
     
     .contenido-inicio {
-        max-width: 600px;
-        margin: 0 auto;
-        width: 100%;
+        max-width: 650px;
     }
     
-    .ar-header {
-        padding: 1.25rem 2rem;
+    .titulo-artista {
+        font-size: 40px;
     }
     
-    .btn-control {
-        padding: 0.8rem 1.25rem;
+    .subtitulo {
+        font-size: 16px;
     }
-}
-
-/* Pantallas grandes (≥ 1024px) */
-@media (min-width: 1024px) {
-    html {
+    
+    .texto-descripcion {
         font-size: 18px;
     }
     
+    .imagen-container {
+        height: 200px;
+    }
+    
+    .instrucciones-titulo {
+        font-size: 18px;
+    }
+    
+    .titulo-obra {
+        font-size: 24px;
+    }
+    
+    .btn-primario, .btn-secundario {
+        padding: 18px 30px;
+        font-size: 17px;
+    }
+    
+    .ar-header {
+        padding: 20px;
+    }
+    
+    #titulo-obra-ar {
+        font-size: 18px;
+    }
+}
+
+/* Desktop pequeño (≥ 1024px) */
+@media (min-width: 1024px) {
     .contenido-inicio {
         max-width: 700px;
     }
     
-    .modal-contenido {
-        padding: 2rem;
+    .galeria-imagenes {
+        gap: 25px;
+    }
+    
+    .imagen-container {
+        height: 220px;
+        min-width: calc(33.333% - 17px);
     }
 }
 
-/* Teléfonos muy pequeños (≤ 320px) */
-@media (max-width: 320px) {
-    .container {
-        padding: 0 0.75rem;
-    }
-    
-    h1 {
-        font-size: 1.6rem;
-    }
-    
-    .btn-primario, .btn-secundario {
-        padding: 0.875rem 1.25rem;
-    }
-    
-    .ar-header {
-        padding: 0.875rem;
-    }
-}
-
-/* Orientación horizontal */
-@media (orientation: landscape) and (max-height: 500px) {
+/* Orientación horizontal en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
     #inicio {
-        padding: 0.5rem 0;
+        padding: 15px;
+        overflow-y: auto;
     }
     
     .cabecera {
-        padding: max(1rem, env(safe-area-inset-top)) 0 1rem;
+        margin-bottom: 15px;
     }
     
     .titulo-artista {
-        font-size: 1.6rem;
-        margin-bottom: 0.25rem;
+        font-size: 24px;
     }
     
     .subtitulo {
-        font-size: 0.9rem;
+        font-size: 12px;
     }
     
-    .texto-descripcion {
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
+    .galeria-imagenes {
+        flex-direction: row;
+        height: 120px;
+        margin-bottom: 15px;
+    }
+    
+    .imagen-container {
+        height: 120px;
     }
     
     .instrucciones {
-        padding: 1rem;
-        margin-bottom: 1rem;
+        padding: 15px;
+        margin-bottom: 15px;
     }
     
     .info-obra-seleccionada {
-        padding: 1rem;
-        margin-top: 0.5rem;
+        padding: 15px;
+        margin-bottom: 15px;
     }
     
     .controles-inicio {
-        margin-bottom: 1rem;
+        flex-direction: row;
+        margin-bottom: 15px;
+    }
+}
+
+/* iPhone SE y pantallas muy pequeñas */
+@media (max-width: 375px) and (max-height: 667px) {
+    #inicio {
+        padding: 15px;
     }
     
-    .ar-header {
-        padding: 0.75rem;
+    .titulo-artista {
+        font-size: 24px;
     }
     
-    .ar-instrucciones {
-        padding: 0.75rem 1rem;
-    }
-}
-
-/* Pantallas muy altas (≥ 1000px altura) */
-@media (min-height: 1000px) {
-    .contenido-inicio {
-        justify-content: center;
-        gap: 3rem;
-    }
-}
-
-/* Safari iOS específico */
-@supports (-webkit-touch-callout: none) {
-    .pantalla {
-        min-height: -webkit-fill-available;
+    .texto-descripcion {
+        font-size: 15px;
     }
     
-    .ar-overlay {
-        padding-top: max(1rem, env(safe-area-inset-top));
+    .imagen-container {
+        height: 150px;
     }
     
-    .modal {
-        padding-top: max(1rem, env(safe-area-inset-top));
+    .btn-primario, .btn-secundario {
+        padding: 14px 20px;
+        font-size: 15px;
     }
-}
-
-/* Chrome Android específico */
-@supports not (-webkit-touch-callout: none) {
-    .ar-overlay {
-        padding-top: 1rem;
-    }
-}
-
-/* Estados de carga */
-.cargando {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* Prevenir selección de texto en botones */
-button {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-/* Mejorar rendimiento de animaciones */
-.btn-primario, .btn-secundario, .btn-control {
-    will-change: transform, background-color;
-}
-
-.ar-overlay {
-    will-change: opacity;
 }
 
 /* Ajustes para dispositivos con notch */
-@supports (padding: max(0px)) {
-    .cabecera, .ar-overlay, .modal {
-        padding-top: max(1.5rem, env(safe-area-inset-top));
+@supports (padding-top: env(safe-area-inset-top)) {
+    #inicio {
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
     }
     
-    .pie-inicio {
-        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    .ar-overlay {
+        padding-top: max(15px, env(safe-area-inset-top));
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
     }
+}
+
+/* Prevenir zoom en inputs en iOS */
+input, select, textarea, button {
+    font-size: 16px;
 }

@@ -1,519 +1,452 @@
 /**
  * Galería Daniel Guido - WebAR Responsive
- * Script optimizado para todos los dispositivos móviles
+ * Con cámara trasera garantizada
  */
 
-// Estado global de la aplicación
-const EstadoApp = {
-    arActivo: false,
-    rotacionAutomatica: true,
-    audioActivo: false,
-    escalaActual: 1,
-    esculturaCargada: false,
-    isMobile: false,
-    orientation: 'portrait'
+const appState = {
+    arActive: false,
+    rotationActive: true,
+    audioActive: false,
+    cameraStream: null
 };
 
-// Elementos DOM
-const elementos = {
-    // Pantallas
-    pantallaInicio: document.getElementById('inicio'),
+const elements = {
+    inicio: document.getElementById('inicio'),
     contenedorAR: document.getElementById('contenedor-ar'),
-    
-    // Botones
     btnIniciarAR: document.getElementById('btn-iniciar-ar'),
     btnVolver: document.getElementById('btn-volver'),
     btnInfo: document.getElementById('btn-info'),
     btnCerrarModal: document.getElementById('btn-cerrar-modal'),
-    
-    // Controles AR
     btnRotar: document.getElementById('btn-rotar'),
     btnEscalar: document.getElementById('btn-escalar'),
     btnAudio: document.getElementById('btn-audio'),
-    
-    // Textos dinámicos
-    tituloObraAR: document.getElementById('titulo-obra-ar'),
-    detallesObraAR: document.getElementById('detalles-obra-ar'),
     textoInstrucciones: document.getElementById('texto-instrucciones'),
     indicadorCarga: document.getElementById('indicador-carga'),
-    
-    // Modal
     modalInfo: document.getElementById('modal-info'),
-    
-    // Elementos A-Frame
     escultura: document.getElementById('escultura'),
-    marcador: document.getElementById('marcador'),
-    escenaAR: document.querySelector('a-scene')
+    marcador: document.getElementById('marcador')
 };
 
 /**
- * Inicializa la aplicación
+ * FUNCIÓN CORREGIDA: Abre cámara trasera
  */
-function inicializarApp() {
-    console.log('🖼️ Galería Daniel Guido - WebAR Responsive');
-    
-    // Detectar dispositivo y orientación
-    detectarDispositivo();
-    
-    // Configurar listeners
-    configurarEventListeners();
-    
-    // Verificar compatibilidad
-    verificarCompatibilidadAR();
-    
-    // Ajustar para iOS Safari
-    ajustarParaSafari();
-    
-    console.log('✅ Aplicación inicializada para:', 
-        EstadoApp.isMobile ? 'Móvil' : 'Desktop', 
-        EstadoApp.orientation);
-}
-
-/**
- * Detecta tipo de dispositivo y orientación
- */
-function detectarDispositivo() {
-    // Detectar móvil
-    EstadoApp.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Detectar orientación inicial
-    EstadoApp.orientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-    
-    // Listener para cambios de orientación
-    window.addEventListener('resize', manejarResize);
-    window.addEventListener('orientationchange', manejarOrientacionChange);
-}
-
-/**
- * Maneja cambios de tamaño
- */
-function manejarResize() {
-    EstadoApp.orientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-    
-    // Ajustar AR si está activo
-    if (EstadoApp.arActivo) {
-        ajustarVentanaAR();
-    }
-}
-
-/**
- * Maneja cambios de orientación
- */
-function manejarOrientacionChange() {
-    // Pequeño delay para que el navegador actualice dimensiones
-    setTimeout(() => {
-        EstadoApp.orientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+async function getRearCamera() {
+    try {
+        // Primero intentamos obtener TODAS las cámaras disponibles
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
         
-        if (EstadoApp.arActivo) {
-            ajustarVentanaAR();
-            mostrarMensajeOrientacion();
-        }
-    }, 300);
-}
-
-/**
- * Ajustes específicos para Safari iOS
- */
-function ajustarParaSafari() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
-    if (isIOS) {
-        // Prevenir zoom en inputs
-        document.addEventListener('touchstart', (e) => {
-            if (e.target.tagName === 'INPUT' || 
-                e.target.tagName === 'TEXTAREA' || 
-                e.target.tagName === 'BUTTON' ||
-                e.target.tagName === 'SELECT') {
-                e.preventDefault();
+        console.log('📷 Cámaras encontradas:', videoDevices.length);
+        
+        // Buscar cámara trasera (environment)
+        let constraints = {
+            video: {
+                facingMode: { ideal: 'environment' },  // Primero intentamos environment
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
             }
-        }, { passive: false });
+        };
         
-        // Ajustar altura para Safari
-        document.documentElement.style.height = '-webkit-fill-available';
-        document.body.style.height = '-webkit-fill-available';
-    }
-}
-
-/**
- * Configura todos los event listeners
- */
-function configurarEventListeners() {
-    // Navegación principal
-    elementos.btnIniciarAR.addEventListener('click', iniciarExperienciaAR);
-    elementos.btnVolver.addEventListener('click', volverAlInicio);
-    elementos.btnInfo.addEventListener('click', mostrarInformacion);
-    elementos.btnCerrarModal.addEventListener('click', cerrarModal);
-    
-    // Controles AR
-    elementos.btnRotar.addEventListener('click', toggleRotacion);
-    elementos.btnEscalar.addEventListener('click', resetEscala);
-    elementos.btnAudio.addEventListener('click', toggleAudio);
-    
-    // Cerrar modal haciendo clic fuera
-    elementos.modalInfo.addEventListener('click', (e) => {
-        if (e.target === elementos.modalInfo) {
-            cerrarModal();
+        // Intentar con la restricción environment primero
+        let stream;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            console.log('✅ Cámara trasera encontrada (environment)');
+            return stream;
+        } catch (error) {
+            console.log('⚠️ No se pudo usar environment, intentando método alternativo...');
+            
+            // Método alternativo para algunos dispositivos
+            if (videoDevices.length > 1) {
+                // En Android, la segunda cámara suele ser la trasera
+                constraints.video = {
+                    deviceId: { exact: videoDevices[1].deviceId },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('✅ Cámara trasera encontrada (deviceId)');
+                return stream;
+            } else {
+                // Si solo hay una cámara, usamos esa
+                constraints.video = {
+                    facingMode: 'user',  // Cámara frontal
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('⚠️ Usando cámara frontal (solo hay una disponible)');
+                return stream;
+            }
         }
-    });
-    
-    // Tecla Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (EstadoApp.arActivo) volverAlInicio();
-            if (elementos.modalInfo.getAttribute('aria-hidden') === 'false') cerrarModal();
-        }
-    });
-    
-    // Modelo 3D
-    if (elementos.escultura) {
-        elementos.escultura.addEventListener('model-loaded', manejarModeloCargado);
-        elementos.escultura.addEventListener('error', manejarErrorModelo);
-    }
-    
-    // Marcador AR
-    if (elementos.marcador) {
-        elementos.marcador.addEventListener('markerFound', manejarMarcadorEncontrado);
-        elementos.marcador.addEventListener('markerLost', manejarMarcadorPerdido);
-    }
-    
-    // Touch events para mejor UX en móvil
-    document.addEventListener('touchmove', (e) => {
-        if (EstadoApp.arActivo && e.target.tagName === 'BUTTON') {
-            e.preventDefault();
-        }
-    }, { passive: false });
-}
-
-/**
- * Verifica compatibilidad con WebAR
- */
-function verificarCompatibilidadAR() {
-    if (!EstadoApp.isMobile) {
-        elementos.btnIniciarAR.disabled = true;
-        elementos.btnIniciarAR.innerHTML = '<span class="btn-texto">AR solo disponible en móviles</span>';
-        elementos.btnIniciarAR.classList.add('cargando');
-        elementos.btnIniciarAR.style.opacity = '0.7';
-        console.warn('⚠️ WebAR solo disponible en dispositivos móviles');
-    }
-    
-    // Verificar si es iOS y mostrar advertencia sobre Safari
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
-        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-        if (!isSafari) {
-            mostrarAdvertenciaNavegador('Para mejor experiencia en iOS, usa Safari');
-        }
+    } catch (error) {
+        console.error('❌ Error grave al acceder a cámara:', error);
+        throw error;
     }
 }
 
 /**
- * Maneja carga del modelo 3D
+ * Inicia AR con cámara trasera
  */
-function manejarModeloCargado() {
-    console.log('✅ Modelo 3D cargado');
-    EstadoApp.esculturaCargada = true;
-    actualizarInterfazCarga(false);
+async function startAR() {
+    console.log('🚀 Iniciando AR con cámara trasera...');
     
-    // Ajustar escala según dispositivo
-    if (EstadoApp.isMobile && EstadoApp.orientation === 'portrait') {
-        elementos.escultura.setAttribute('scale', '0.4 0.4 0.4');
-    }
-}
-
-/**
- * Maneja error del modelo 3D
- */
-function manejarErrorModelo(e) {
-    console.error('❌ Error cargando modelo 3D:', e.detail);
-    mostrarErrorModelo();
-}
-
-/**
- * Maneja marcador encontrado
- */
-function manejarMarcadorEncontrado() {
-    console.log('🎯 Marcador detectado');
-    actualizarInstrucciones('¡Escultura encontrada! Puedes acercarte y observarla.');
-    actualizarInterfazCarga(false);
-}
-
-/**
- * Maneja marcador perdido
- */
-function manejarMarcadorPerdido() {
-    console.log('🔍 Buscando escultura...');
-    actualizarInstrucciones('Mueve el dispositivo para encontrar una superficie plana');
-    actualizarInterfazCarga(true);
-}
-
-/**
- * Inicia la experiencia AR
- */
-async function iniciarExperienciaAR() {
-    console.log('🚀 Iniciando AR...');
+    // Verificar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    if (!EstadoApp.isMobile) {
-        alert('La experiencia AR está optimizada para dispositivos móviles. Por favor, accede desde tu teléfono.');
+    if (!isMobile) {
+        alert('Por favor, accede desde un dispositivo móvil para usar la experiencia AR.');
         return;
     }
     
+    // Mostrar mensaje de carga
+    elements.textoInstrucciones.textContent = 'Activando cámara trasera...';
+    updateLoadingUI(true);
+    
     try {
-        // Solicitar permisos de cámara
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-                facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            } 
+        // 1. Obtener cámara trasera
+        const stream = await getRearCamera();
+        appState.cameraStream = stream;
+        
+        // 2. Detectar si es cámara frontal o trasera (para feedback al usuario)
+        const videoTrack = stream.getVideoTracks()[0];
+        const settings = videoTrack.getSettings();
+        
+        console.log('📸 Configuración cámara:', {
+            facingMode: settings.facingMode,
+            deviceLabel: videoTrack.label,
+            width: settings.width,
+            height: settings.height
         });
         
-        // Detener stream previo si existe
-        stream.getTracks().forEach(track => track.stop());
+        // 3. Dar feedback al usuario sobre qué cámara se está usando
+        if (settings.facingMode === 'environment' || videoTrack.label.toLowerCase().includes('back')) {
+            elements.textoInstrucciones.textContent = 'Cámara trasera activada. Busca una superficie plana.';
+        } else if (settings.facingMode === 'user') {
+            elements.textoInstrucciones.textContent = 'Cámara frontal activada. Para mejor experiencia, usa la cámara trasera.';
+        } else {
+            elements.textoInstrucciones.textContent = 'Cámara activada. Busca una superficie plana.';
+        }
         
-        // Transición a AR
-        transicionAAR();
+        // 4. Cambiar a pantalla AR
+        elements.inicio.classList.remove('activa');
+        elements.contenedorAR.classList.add('activa');
+        appState.arActive = true;
+        
+        // 5. Ajustar para pantalla
+        adjustForScreenSize();
+        
+        // 6. Forzar uso de cámara en A-Frame
+        setupAframeCamera(stream);
+        
+        console.log('🎬 AR activado con cámara trasera');
         
     } catch (error) {
-        console.error('❌ Error cámara:', error);
-        manejarErrorCamara(error);
+        console.error('❌ Error al iniciar AR:', error);
+        elements.textoInstrucciones.textContent = 'Error al acceder a la cámara.';
+        
+        // Mostrar mensaje específico según el error
+        if (error.name === 'NotAllowedError') {
+            alert('Permiso de cámara denegado. Por favor:\n1. Da permisos de cámara\n2. Recarga la página\n3. Intenta de nuevo');
+        } else if (error.name === 'NotFoundError') {
+            alert('No se encontró cámara trasera. Usando cámara frontal...');
+            // Intentar con cámara frontal como fallback
+            tryFrontCamera();
+        } else {
+            alert('Error técnico: ' + error.message);
+        }
+        backToHome();
     }
 }
 
 /**
- * Transición a AR
+ * Intenta usar cámara frontal como fallback
  */
-function transicionAAR() {
-    EstadoApp.arActivo = true;
+async function tryFrontCamera() {
+    try {
+        const constraints = {
+            video: {
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        appState.cameraStream = stream;
+        
+        // Actualizar mensaje
+        elements.textoInstrucciones.textContent = 'Cámara frontal activada. Apunta a una superficie.';
+        
+        // Cambiar a AR
+        elements.inicio.classList.remove('activa');
+        elements.contenedorAR.classList.add('activa');
+        appState.arActive = true;
+        
+        setupAframeCamera(stream);
+        
+    } catch (error) {
+        console.error('❌ Fallback también falló:', error);
+        alert('No se pudo acceder a ninguna cámara.');
+    }
+}
+
+/**
+ * Configura A-Frame para usar nuestro stream de cámara
+ */
+function setupAframeCamera(stream) {
+    // Esta función es importante para asegurar que A-Frame use nuestra cámara
+    
+    // 1. Obtener el elemento de video de A-Frame
+    const scene = document.querySelector('a-scene');
+    if (!scene) return;
+    
+    // 2. Esperar a que A-Frame esté listo
+    if (scene.hasLoaded) {
+        applyCameraToScene(stream);
+    } else {
+        scene.addEventListener('loaded', () => {
+            applyCameraToScene(stream);
+        });
+    }
+}
+
+function applyCameraToScene(stream) {
+    // 3. Forzar que A-Frame use nuestro stream
+    const cameraSystem = document.querySelector('a-scene').systems['camera'];
+    if (cameraSystem) {
+        // Intentar asignar el stream directamente
+        const videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+        videoElement.setAttribute('autoplay', 'true');
+        videoElement.setAttribute('playsinline', 'true');
+        
+        // Insertar el video en el DOM (oculto)
+        videoElement.style.position = 'absolute';
+        videoElement.style.width = '0';
+        videoElement.style.height = '0';
+        videoElement.style.opacity = '0';
+        document.body.appendChild(videoElement);
+        
+        // Dar tiempo para que el video empiece
+        videoElement.play().catch(e => console.log('Video play error:', e));
+    }
+}
+
+/**
+ * Vuelve al inicio y detiene la cámara
+ */
+function backToHome() {
+    // Detener stream de cámara
+    if (appState.cameraStream) {
+        appState.cameraStream.getTracks().forEach(track => {
+            track.stop();
+        });
+        appState.cameraStream = null;
+    }
     
     // Cambiar pantallas
-    elementos.pantallaInicio.classList.remove('activa');
-    elementos.contenedorAR.classList.add('activa');
+    elements.contenedorAR.classList.remove('activa');
+    elements.inicio.classList.add('activa');
+    appState.arActive = false;
     
-    // Ajustar ventana AR
-    ajustarVentanaAR();
+    resetControls();
     
-    // Actualizar interfaz
-    actualizarInstrucciones('Mueve el dispositivo para encontrar una superficie plana');
-    actualizarInterfazCarga(true);
-    
-    // Forzar redimensionamiento para Safari
-    setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-    }, 100);
-    
-    console.log('🔄 AR activado');
+    console.log('🏠 Volviendo al inicio - Cámara detenida');
 }
 
 /**
- * Ajusta ventana AR según dispositivo
+ * Resto de funciones (sin cambios)
  */
-function ajustarVentanaAR() {
-    if (!elementos.escenaAR) return;
+function initApp() {
+    console.log('🖼️ Galería Daniel Guido iniciando...');
     
-    const escena = elementos.escenaAR;
+    setupEventListeners();
+    checkARCompatibility();
+    setupARListeners();
     
-    // Ajustar para orientación
-    if (EstadoApp.orientation === 'landscape') {
-        // En horizontal, ajustar escala
-        if (elementos.escultura) {
-            elementos.escultura.setAttribute('scale', '0.3 0.3 0.3');
+    console.log('✅ Aplicación lista');
+}
+
+function setupEventListeners() {
+    elements.btnIniciarAR.addEventListener('click', startAR);
+    elements.btnVolver.addEventListener('click', backToHome);
+    elements.btnInfo.addEventListener('click', showInfo);
+    elements.btnCerrarModal.addEventListener('click', closeModal);
+    
+    elements.btnRotar.addEventListener('click', toggleRotation);
+    elements.btnEscalar.addEventListener('click', resetScale);
+    elements.btnAudio.addEventListener('click', toggleAudio);
+    
+    elements.modalInfo.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (appState.arActive) backToHome();
+            if (elements.modalInfo.getAttribute('aria-hidden') === 'false') closeModal();
         }
-        actualizarInstrucciones('Encuentra una superficie plana para ver la escultura');
-    } else {
-        // En vertical, escala normal
-        if (elementos.escultura) {
-            elementos.escultura.setAttribute('scale', '0.5 0.5 0.5');
+    });
+}
+
+function setupARListeners() {
+    if (!elements.escultura || !elements.marcador) return;
+    
+    elements.escultura.addEventListener('model-loaded', function() {
+        console.log('✅ Modelo 3D cargado');
+        updateLoadingUI(false);
+    });
+    
+    elements.escultura.addEventListener('error', function(e) {
+        console.error('❌ Error cargando modelo:', e.detail);
+        elements.textoInstrucciones.textContent = 'Error cargando escultura. Recarga.';
+    });
+    
+    elements.marcador.addEventListener('markerFound', function() {
+        console.log('🎯 Marcador encontrado');
+        elements.textoInstrucciones.textContent = '¡Escultura encontrada! Acércate.';
+        updateLoadingUI(false);
+    });
+    
+    elements.marcador.addEventListener('markerLost', function() {
+        console.log('🔍 Buscando marcador...');
+        elements.textoInstrucciones.textContent = 'Busca una superficie plana';
+        updateLoadingUI(true);
+    });
+}
+
+function checkARCompatibility() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+        elements.btnIniciarAR.disabled = true;
+        elements.btnIniciarAR.innerHTML = '<span class="btn-texto">AR solo en móviles</span>';
+        elements.btnIniciarAR.style.opacity = '0.5';
+    }
+    
+    // Verificar si el navegador soporta getUserMedia
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        elements.btnIniciarAR.disabled = true;
+        elements.btnIniciarAR.innerHTML = '<span class="btn-texto">Navegador no compatible</span>';
+        console.error('❌ Navegador no soporta getUserMedia');
+    }
+}
+
+function adjustForScreenSize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    console.log(`📱 Tamaño: ${width}x${height}`);
+    
+    if (width < 400 || height < 500) {
+        if (elements.escultura) {
+            elements.escultura.setAttribute('scale', '0.4 0.4 0.4');
         }
     }
     
-    console.log('🔄 Ventana AR ajustada para:', EstadoApp.orientation);
+    if (width > height) {
+        elements.textoInstrucciones.textContent += ' (Modo horizontal)';
+    }
 }
 
-/**
- * Vuelve al inicio
- */
-function volverAlInicio() {
-    EstadoApp.arActivo = false;
-    
-    elementos.contenedorAR.classList.remove('activa');
-    elementos.pantallaInicio.classList.add('activa');
-    
-    resetControlesAR();
-    
-    console.log('🏠 Regreso al inicio');
+function showInfo() {
+    elements.modalInfo.setAttribute('aria-hidden', 'false');
 }
 
-/**
- * Muestra información
- */
-function mostrarInformacion() {
-    elementos.modalInfo.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    
-    // Scroll al top del modal
-    elementos.modalInfo.scrollTop = 0;
+function closeModal() {
+    elements.modalInfo.setAttribute('aria-hidden', 'true');
 }
 
-/**
- * Cierra modal
- */
-function cerrarModal() {
-    elementos.modalInfo.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = 'auto';
-}
-
-/**
- * Control de rotación
- */
-function toggleRotacion() {
-    EstadoApp.rotacionAutomatica = !EstadoApp.rotacionAutomatica;
+function toggleRotation() {
+    appState.rotationActive = !appState.rotationActive;
     
-    if (elementos.escultura) {
-        if (EstadoApp.rotacionAutomatica) {
-            elementos.escultura.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear');
-            elementos.btnRotar.classList.add('activo');
+    if (elements.escultura) {
+        if (appState.rotationActive) {
+            elements.escultura.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear');
+            elements.btnRotar.textContent = '↻ Rotando';
+            elements.btnRotar.style.background = 'rgba(44, 44, 44, 0.2)';
         } else {
-            elementos.escultura.removeAttribute('animation');
-            elementos.btnRotar.classList.remove('activo');
+            elements.escultura.removeAttribute('animation');
+            elements.btnRotar.textContent = '↻ Rotar';
+            elements.btnRotar.style.background = '';
         }
     }
 }
 
-/**
- * Reinicia escala
- */
-function resetEscala() {
-    if (!elementos.escultura) return;
+function resetScale() {
+    if (!elements.escultura) return;
     
-    const escala = EstadoApp.orientation === 'landscape' ? '0.3 0.3 0.3' : '0.5 0.5 0.5';
-    elementos.escultura.setAttribute('scale', escala);
+    const width = window.innerWidth;
+    const scale = width < 400 ? '0.4 0.4 0.4' : '0.5 0.5 0.5';
+    elements.escultura.setAttribute('scale', scale);
     
-    // Feedback táctil
-    elementos.btnEscalar.classList.add('activo');
-    setTimeout(() => elementos.btnEscalar.classList.remove('activo'), 300);
+    elements.btnEscalar.style.background = 'rgba(196, 163, 90, 0.2)';
+    setTimeout(() => {
+        elements.btnEscalar.style.background = '';
+    }, 300);
 }
 
-/**
- * Control de audio
- */
 function toggleAudio() {
-    EstadoApp.audioActivo = !EstadoApp.audioActivo;
+    appState.audioActive = !appState.audioActive;
     
-    if (EstadoApp.audioActivo) {
-        elementos.btnAudio.classList.add('activo');
+    if (appState.audioActive) {
+        elements.btnAudio.textContent = '🔊 Escuchando';
+        elements.btnAudio.style.background = 'rgba(44, 44, 44, 0.2)';
     } else {
-        elementos.btnAudio.classList.remove('activo');
+        elements.btnAudio.textContent = '🔊 Audio';
+        elements.btnAudio.style.background = '';
     }
 }
 
-/**
- * Actualiza instrucciones
- */
-function actualizarInstrucciones(texto) {
-    if (elementos.textoInstrucciones) {
-        elementos.textoInstrucciones.textContent = texto;
+function updateLoadingUI(loading) {
+    if (elements.indicadorCarga) {
+        elements.indicadorCarga.style.display = loading ? 'flex' : 'none';
     }
 }
 
-/**
- * Actualiza interfaz de carga
- */
-function actualizarInterfazCarga(cargando) {
-    if (elementos.indicadorCarga) {
-        elementos.indicadorCarga.style.display = cargando ? 'flex' : 'none';
-    }
+function resetControls() {
+    appState.rotationActive = true;
+    appState.audioActive = false;
     
-    if (cargando) {
-        elementos.textoInstrucciones?.classList.add('cargando');
-    } else {
-        elementos.textoInstrucciones?.classList.remove('cargando');
-    }
-}
-
-/**
- * Resetea controles AR
- */
-function resetControlesAR() {
-    EstadoApp.rotacionAutomatica = true;
-    EstadoApp.audioActivo = false;
+    elements.btnRotar.textContent = '↻ Rotar';
+    elements.btnRotar.style.background = '';
     
-    elementos.btnRotar.classList.remove('activo');
-    elementos.btnAudio.classList.remove('activo');
-    elementos.btnEscalar.classList.remove('activo');
-}
-
-/**
- * Maneja error de cámara
- */
-function manejarErrorCamara(error) {
-    let mensaje = 'No se pudo acceder a la cámara. ';
+    elements.btnAudio.textContent = '🔊 Audio';
+    elements.btnAudio.style.background = '';
     
-    switch(error.name) {
-        case 'NotAllowedError':
-            mensaje += 'Por favor, permite el acceso a la cámara en la configuración de tu navegador.';
-            break;
-        case 'NotFoundError':
-            mensaje += 'No se encontró una cámara en tu dispositivo.';
-            break;
-        case 'NotSupportedError':
-            mensaje += 'Tu navegador no soporta acceso a la cámara.';
-            break;
-        default:
-            mensaje += 'Por favor, verifica los permisos de cámara y recarga la página.';
+    elements.btnEscalar.style.background = '';
+}
+
+// Manejar cambios de pantalla/orientación
+window.addEventListener('resize', function() {
+    if (appState.arActive) {
+        adjustForScreenSize();
     }
-    
-    alert(mensaje);
-}
+});
 
-/**
- * Maneja error de modelo
- */
-function mostrarErrorModelo() {
-    actualizarInstrucciones('Error cargando la escultura. Verifica tu conexión.');
-    
-    // Fallback visual
-    if (elementos.escultura) {
-        elementos.escultura.setAttribute('geometry', 'primitive: box; width: 0.5; height: 0.5; depth: 0.5');
-        elementos.escultura.setAttribute('material', 'color: #C4A35A');
-    }
-}
-
-/**
- * Muestra mensaje de orientación
- */
-function mostrarMensajeOrientacion() {
-    if (EstadoApp.orientation === 'landscape') {
-        actualizarInstrucciones('Modo horizontal activado. Encuentra una superficie plana.');
-    }
-}
-
-/**
- * Muestra advertencia de navegador
- */
-function mostrarAdvertenciaNavegador(mensaje) {
-    console.warn('⚠️ ' + mensaje);
-}
-
-// Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarApp);
-} else {
-    inicializarApp();
-}
-
-// Exportar para debugging
-if (window) {
-    window.GaleriaDanielGuido = {
-        EstadoApp,
-        elementos,
-        funciones: {
-            iniciarExperienciaAR,
-            volverAlInicio,
-            toggleRotacion,
-            resetEscala,
-            toggleAudio
+window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+        if (appState.arActive) {
+            adjustForScreenSize();
         }
-    };
+    }, 300);
+});
+
+// Manejar cierre de página para detener cámara
+window.addEventListener('beforeunload', function() {
+    if (appState.cameraStream) {
+        appState.cameraStream.getTracks().forEach(track => track.stop());
+    }
+});
+
+// Inicializar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
 }
 
-console.log('🎨 Galería Daniel Guido - WebAR Responsive cargado');
+console.log('🎨 Galería Daniel Guido - Cámara trasera configurada');
