@@ -1,0 +1,739 @@
+/* Reset y base - Mobile First */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #FFFFFF;
+    color: #2C2C2C;
+    overflow: hidden;
+    height: 100vh;
+    height: -webkit-fill-available;
+    width: 100vw;
+    position: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+}
+
+/* Container responsivo */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Tipografía responsiva */
+h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+h1 { 
+    font-size: clamp(1.8rem, 5vw, 2.5rem); 
+}
+
+h2 { 
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem); 
+}
+
+h3 { 
+    font-size: clamp(1.1rem, 3vw, 1.4rem); 
+}
+
+h4 { 
+    font-size: clamp(1rem, 2.8vw, 1.2rem); 
+}
+
+p, li {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Pantallas */
+.pantalla {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+}
+
+.pantalla.activa {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Pantalla de inicio */
+#inicio {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+}
+
+.cabecera {
+    padding: max(1.5rem, env(safe-area-inset-top)) 0 1.5rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.titulo-artista {
+    margin-bottom: 0.5rem;
+    color: #2C2C2C;
+    letter-spacing: -0.5px;
+}
+
+.subtitulo {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    font-weight: 400;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contenido-inicio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem 0;
+}
+
+.descripcion {
+    margin-bottom: 2rem;
+}
+
+.texto-descripcion {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: #444;
+    margin-bottom: 2rem;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.instrucciones {
+    background: #F8F8F8;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    border: 1px solid #EAEAEA;
+}
+
+.instrucciones-titulo {
+    margin-bottom: 0.75rem;
+    color: #2C2C2C;
+}
+
+.instrucciones-lista {
+    list-style-position: inside;
+    color: #666;
+    padding-left: 0.5rem;
+}
+
+.instrucciones-lista li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+    padding-left: 0.5rem;
+}
+
+.info-obra-seleccionada {
+    text-align: center;
+    padding: 1.25rem;
+    border-top: 1px solid #EAEAEA;
+    margin-top: 1rem;
+}
+
+.titulo-obra {
+    margin-bottom: 0.5rem;
+    color: #2C2C2C;
+}
+
+.detalles-obra {
+    color: #888;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.texto-curatorial {
+    font-style: italic;
+    color: #666;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+}
+
+/* Controles */
+.controles-inicio {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.btn-primario, .btn-secundario, .btn-volver, .btn-control {
+    border: none;
+    padding: clamp(1rem, 3vw, 1.2rem) clamp(1.5rem, 4vw, 2rem);
+    font-size: clamp(1rem, 2.8vw, 1.1rem);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.btn-primario {
+    background: #2C2C2C;
+    color: white;
+    box-shadow: 0 2px 8px rgba(44, 44, 44, 0.1);
+}
+
+.btn-primario:active {
+    background: #1A1A1A;
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(44, 44, 44, 0.1);
+}
+
+.btn-secundario {
+    background: transparent;
+    color: #2C2C2C;
+    border: 2px solid #EAEAEA;
+}
+
+.btn-secundario:active {
+    border-color: #2C2C2C;
+    background: #F8F8F8;
+}
+
+.btn-texto-movil {
+    display: none;
+}
+
+/* Footer */
+.pie-inicio {
+    text-align: center;
+    padding: 1.25rem 0;
+    border-top: 1px solid #EAEAEA;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.leyenda {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: #888;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+}
+
+.creditos {
+    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+    color: #AAA;
+}
+
+/* Contenedor AR */
+#contenedor-ar {
+    background: #000;
+    height: 100vh;
+    height: -webkit-fill-available;
+}
+
+.ar-scene {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Overlay AR */
+.ar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    pointer-events: none;
+    padding-top: env(safe-area-inset-top);
+}
+
+.ar-overlay > * {
+    pointer-events: all;
+}
+
+.ar-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 0 0 16px 16px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-volver {
+    background: rgba(44, 44, 44, 0.08);
+    color: #2C2C2C;
+    padding: 0.7rem 1.25rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: min-content;
+}
+
+.btn-volver:active {
+    background: rgba(44, 44, 44, 0.15);
+}
+
+.info-obra-ar {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+#titulo-obra-ar {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#detalles-obra-ar {
+    color: #888;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ar-controles {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    width: 100%;
+    justify-content: center;
+    order: 3;
+}
+
+.btn-control {
+    background: rgba(44, 44, 44, 0.08);
+    color: #2C2C2C;
+    padding: 0.7rem;
+    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+    flex: 1;
+    min-width: 0;
+    max-width: 33%;
+}
+
+.btn-control .btn-icono {
+    font-size: 1.2em;
+}
+
+.btn-control:active {
+    background: rgba(44, 44, 44, 0.15);
+}
+
+.btn-control.activo {
+    background: #2C2C2C;
+    color: white;
+}
+
+/* Instrucciones AR */
+.ar-instrucciones {
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 0.875rem 1rem;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#texto-instrucciones {
+    margin-bottom: 0.75rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.4;
+}
+
+.indicador-carga {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.punto-carga {
+    width: 6px;
+    height: 6px;
+    background: #C4A35A;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulso 1.5s infinite ease-in-out;
+}
+
+.punto-carga:nth-child(2) { animation-delay: 0.2s; }
+.punto-carga:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulso {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: env(safe-area-inset-top) 1rem 1rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal[aria-hidden="false"] {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-contenido {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.btn-cerrar-modal {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #666;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    touch-action: manipulation;
+}
+
+.btn-cerrar-modal:active {
+    background: #F8F8F8;
+    color: #2C2C2C;
+}
+
+.modal-titulo {
+    margin-bottom: 1.25rem;
+    color: #2C2C2C;
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+}
+
+.modal-texto {
+    color: #444;
+}
+
+.modal-texto ul {
+    margin: 1rem 0 1rem 1.25rem;
+    color: #666;
+}
+
+.modal-texto li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+.contacto {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #EAEAEA;
+}
+
+.contacto h4 {
+    margin-bottom: 0.5rem;
+    color: #2C2C2C;
+    font-size: clamp(1rem, 2.8vw, 1.1rem);
+}
+
+.contacto p {
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+}
+
+/* Media Queries - Responsive Design */
+
+/* Tablets en vertical (≥ 600px) */
+@media (min-width: 600px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+    
+    .cabecera {
+        padding: max(2rem, env(safe-area-inset-top)) 0 2rem;
+    }
+    
+    .contenido-inicio {
+        padding: 1.5rem 0;
+    }
+    
+    .instrucciones {
+        padding: 1.5rem;
+    }
+    
+    .controles-inicio {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .btn-primario, .btn-secundario {
+        width: auto;
+        flex: 1;
+    }
+    
+    .ar-header {
+        flex-wrap: nowrap;
+        gap: 1rem;
+    }
+    
+    .ar-controles {
+        width: auto;
+        order: 0;
+    }
+    
+    .btn-control {
+        flex: 0 0 auto;
+        max-width: none;
+        padding: 0.7rem 1rem;
+    }
+    
+    .btn-texto-movil {
+        display: inline;
+    }
+}
+
+/* Tablets en horizontal (≥ 768px) */
+@media (min-width: 768px) {
+    html {
+        font-size: 17px;
+    }
+    
+    .container {
+        padding: 0 2rem;
+    }
+    
+    .contenido-inicio {
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    .ar-header {
+        padding: 1.25rem 2rem;
+    }
+    
+    .btn-control {
+        padding: 0.8rem 1.25rem;
+    }
+}
+
+/* Pantallas grandes (≥ 1024px) */
+@media (min-width: 1024px) {
+    html {
+        font-size: 18px;
+    }
+    
+    .contenido-inicio {
+        max-width: 700px;
+    }
+    
+    .modal-contenido {
+        padding: 2rem;
+    }
+}
+
+/* Teléfonos muy pequeños (≤ 320px) */
+@media (max-width: 320px) {
+    .container {
+        padding: 0 0.75rem;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .btn-primario, .btn-secundario {
+        padding: 0.875rem 1.25rem;
+    }
+    
+    .ar-header {
+        padding: 0.875rem;
+    }
+}
+
+/* Orientación horizontal */
+@media (orientation: landscape) and (max-height: 500px) {
+    #inicio {
+        padding: 0.5rem 0;
+    }
+    
+    .cabecera {
+        padding: max(1rem, env(safe-area-inset-top)) 0 1rem;
+    }
+    
+    .titulo-artista {
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .subtitulo {
+        font-size: 0.9rem;
+    }
+    
+    .texto-descripcion {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+    
+    .instrucciones {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-obra-seleccionada {
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .controles-inicio {
+        margin-bottom: 1rem;
+    }
+    
+    .ar-header {
+        padding: 0.75rem;
+    }
+    
+    .ar-instrucciones {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Pantallas muy altas (≥ 1000px altura) */
+@media (min-height: 1000px) {
+    .contenido-inicio {
+        justify-content: center;
+        gap: 3rem;
+    }
+}
+
+/* Safari iOS específico */
+@supports (-webkit-touch-callout: none) {
+    .pantalla {
+        min-height: -webkit-fill-available;
+    }
+    
+    .ar-overlay {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    
+    .modal {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+}
+
+/* Chrome Android específico */
+@supports not (-webkit-touch-callout: none) {
+    .ar-overlay {
+        padding-top: 1rem;
+    }
+}
+
+/* Estados de carga */
+.cargando {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Prevenir selección de texto en botones */
+button {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Mejorar rendimiento de animaciones */
+.btn-primario, .btn-secundario, .btn-control {
+    will-change: transform, background-color;
+}
+
+.ar-overlay {
+    will-change: opacity;
+}
+
+/* Ajustes para dispositivos con notch */
+@supports (padding: max(0px)) {
+    .cabecera, .ar-overlay, .modal {
+        padding-top: max(1.5rem, env(safe-area-inset-top));
+    }
+    
+    .pie-inicio {
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+}
