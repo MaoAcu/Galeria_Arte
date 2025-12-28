@@ -767,3 +767,70 @@ model-viewer {
         color: var(--color-primary);
     }
 }
+/* ESTILOS PARA DEBUG DE COMPATIBILIDAD */
+.debug-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border: 2px solid #8b7355;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 10000;
+    max-width: 300px;
+    display: none;
+}
+
+.debug-panel.visible {
+    display: block;
+}
+
+.debug-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #8b7355;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10001;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.debug-info {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.debug-info ul {
+    margin: 5px 0;
+    padding-left: 15px;
+}
+
+/* TEST BUTTONS PARA AR */
+.test-ar-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.test-ar-btn {
+    background: #4a6fa5;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.test-ar-btn:hover {
+    background: #3a5a8a;
+}
