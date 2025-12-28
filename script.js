@@ -1,5 +1,5 @@
 // GALERÍA VIRTUAL AR - JavaScript Principal
-// Implementación completa con detección de dispositivo, WebAR y controles de audio
+// Versión optimizada para carga robusta y compatibilidad máxima
 
 // =============================================
 // CONFIGURACIÓN Y DATOS DE LA GALERÍA
@@ -51,19 +51,125 @@ const galleryData = [
 ];
 
 // =============================================
-// ESTADO GLOBAL Y VARIABLES
+// GESTOR DE CARGA DE MODEL VIEWER
 // =============================================
 
-let isModelViewerLoaded = false;
-let modelViewerLoadAttempts = 0;
-const MAX_LOAD_ATTEMPTS = 3;
+class ModelViewerManager {
+    constructor() {
+        this.isLoaded = false;
+        this.loadAttempts = 0;
+        this.maxAttempts = 3;
+        this.checkInterval = null;
+    }
+
+    async initialize() {
+        console.log('🔄 Inicializando Model Viewer Manager...');
+        
+        // Verificar si ya está cargado
+        if (this.checkIfLoaded()) {
+            console.log('✅ Model Viewer ya está cargado');
+            this.isLoaded = true;
+            return true;
+        }
+        
+        // Esperar a que se cargue
+        return this.waitForLoad();
+    }
+
+    checkIfLoaded() {
+        // Múltiples formas de verificar si Model Viewer está cargado
+        const checks = [
+            () => 'modelViewer' in window,
+            () => window.modelViewer !== undefined,
+            () => document.querySelector('model-viewer') !== null,
+            () => typeof window.ModelViewerElement !== 'undefined'
+        ];
+        
+        return checks.some(check => {
+            try {
+                return check();
+            } catch (e) {
+                return false;
+            }
+        });
+    }
+
+    waitForLoad() {
+        return new Promise((resolve) => {
+            console.log('⏳ Esperando carga de Model Viewer...');
+            
+            // Intentar cargar manualmente si no está
+            if (!this.checkIfLoaded() && this.loadAttempts < this.maxAttempts) {
+                this.loadAttempts++;
+                this.tryAlternativeSources();
+            }
+            
+            // Escuchar evento personalizado
+            window.addEventListener('model-viewer-loaded', () => {
+                console.log('✅ Model Viewer cargado vía evento');
+                this.isLoaded = true;
+                clearInterval(this.checkInterval);
+                resolve(true);
+            });
+            
+            // Verificar periódicamente
+            this.checkInterval = setInterval(() => {
+                if (this.checkIfLoaded()) {
+                    console.log('✅ Model Viewer detectado en verificación periódica');
+                    this.isLoaded = true;
+                    clearInterval(this.checkInterval);
+                    resolve(true);
+                }
+                
+                if (this.loadAttempts >= this.maxAttempts) {
+                    console.log('⚠️ Máximos intentos alcanzados, continuando sin Model Viewer');
+                    clearInterval(this.checkInterval);
+                    resolve(false);
+                }
+            }, 500);
+            
+            // Timeout total
+            setTimeout(() => {
+                if (!this.isLoaded) {
+                    console.log('⏰ Timeout de carga de Model Viewer');
+                    clearInterval(this.checkInterval);
+                    resolve(false);
+                }
+            }, 10000);
+        });
+    }
+
+    tryAlternativeSources() {
+        console.log(`🔄 Intento ${this.loadAttempts} de cargar Model Viewer...`);
+        
+        const sources = [
+            'https://cdn.jsdelivr.net/npm/@google/model-viewer@2.1.1/dist/model-viewer.min.js',
+            'https://unpkg.com/@google/model-viewer@2.1.1/dist/model-viewer.min.js',
+            'https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.0/model-viewer.min.js'
+        ];
+        
+        if (this.loadAttempts - 1 < sources.length) {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = sources[this.loadAttempts - 1];
+            script.onload = () => {
+                console.log(`✅ Model Viewer cargado desde fuente alternativa ${this.loadAttempts}`);
+                window.dispatchEvent(new Event('model-viewer-loaded'));
+            };
+            script.onerror = () => {
+                console.warn(`❌ Falló fuente alternativa ${this.loadAttempts}`);
+            };
+            document.head.appendChild(script);
+        }
+    }
+
+    isAvailable() {
+        return this.isLoaded;
+    }
+}
 
 // =============================================
-// DETECCIÓN DE DISPOSITIVO Y COMPATIBILIDAD AR
-// =============================================
-
-// =============================================
-// DETECCIÓN DE DISPOSITIVO Y COMPATIBILIDAD AR - VERSIÓN MEJORADA
+// DETECCIÓN DE DISPOSITIVO MEJORADA
 // =============================================
 
 class DeviceDetector {
@@ -76,19 +182,16 @@ class DeviceDetector {
             modelViewerSupported: false,
             arDebugInfo: {}
         };
-        this.init();
     }
 
-    init() {
+    async init(modelViewerManager) {
         this.detectDeviceType();
         this.detectOS();
         this.detectBrowser();
-        this.checkModelViewerSupport();
-        this.checkARSupportAsync().then(arSupported => {
-            this.deviceInfo.arSupported = arSupported;
-            this.updateUI();
-            this.updateAllARButtons();
-        });
+        this.deviceInfo.modelViewerSupported = modelViewerManager.isAvailable();
+        this.deviceInfo.arSupported = await this.checkARSupport();
+        this.updateUI();
+        return this.deviceInfo;
     }
 
     detectDeviceType() {
@@ -112,7 +215,6 @@ class DeviceDetector {
         
         if (/android/i.test(userAgent)) {
             os = 'Android';
-            // Detectar versión de Android
             const androidVersion = userAgent.match(/Android\s([0-9.]+)/);
             if (androidVersion) {
                 this.deviceInfo.arDebugInfo.androidVersion = androidVersion[1];
@@ -120,7 +222,6 @@ class DeviceDetector {
             }
         } else if (/iphone|ipad|ipod/i.test(userAgent)) {
             os = 'iOS';
-            // Detectar versión de iOS
             const iosVersion = userAgent.match(/OS\s([0-9_]+)/);
             if (iosVersion) {
                 this.deviceInfo.arDebugInfo.iosVersion = iosVersion[1].replace(/_/g, '.');
@@ -168,19 +269,7 @@ class DeviceDetector {
         return browser;
     }
 
-    checkModelViewerSupport() {
-        // Verificar si Model Viewer está disponible
-        const isSupported = 'modelViewer' in window || 
-                           document.querySelector('model-viewer') !== null;
-        
-        this.deviceInfo.modelViewerSupported = isSupported;
-        this.deviceInfo.arDebugInfo.modelViewerLoaded = isSupported;
-        
-        return isSupported;
-    }
-
-    async checkARSupportAsync() {
-        // Método mejorado para detectar soporte AR
+    async checkARSupport() {
         const debugInfo = [];
         
         // 1. Verificar si es móvil/tablet
@@ -189,7 +278,7 @@ class DeviceDetector {
         
         if (!isMobileDevice) {
             this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-            return false; // AR solo en móviles/tablets
+            return false;
         }
         
         // 2. Verificar Model Viewer
@@ -200,87 +289,51 @@ class DeviceDetector {
         }
         debugInfo.push('Model Viewer: OK');
         
-        // 3. Verificar compatibilidad por OS y navegador
-        const isAndroid = this.deviceInfo.os === 'Android';
-        const isIOS = this.deviceInfo.os === 'iOS';
-        const isChrome = this.deviceInfo.browser === 'Chrome';
-        const isSafari = this.deviceInfo.browser === 'Safari';
-        
-        debugInfo.push(`OS: ${this.deviceInfo.os}, Navegador: ${this.deviceInfo.browser}`);
-        
-        // Para Android: necesita Chrome y Android 7+
-        if (isAndroid) {
-            if (!isChrome) {
-                debugInfo.push('Android requiere Chrome para AR');
-                this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-                return false;
-            }
-            
+        // 3. Verificar Android + Chrome
+        if (this.deviceInfo.os === 'Android') {
             const androidVersion = this.deviceInfo.arDebugInfo.androidVersionNum || 0;
-            if (androidVersion < 7.0) {
-                debugInfo.push(`Android ${androidVersion} < 7.0 (mínimo requerido)`);
-                this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-                return false;
-            }
-            
             const chromeVersion = this.deviceInfo.arDebugInfo.chromeVersionNum || 0;
-            if (chromeVersion < 81) {
-                debugInfo.push(`Chrome ${chromeVersion} < 81 (mínimo requerido)`);
+            
+            debugInfo.push(`Android ${androidVersion}, Chrome ${chromeVersion}`);
+            
+            if (androidVersion >= 7.0 && chromeVersion >= 81) {
+                debugInfo.push('Cumple requisitos mínimos para AR');
+                this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
+                
+                // Verificar ARCore via WebXR
+                try {
+                    if ('xr' in navigator) {
+                        const arSupported = await navigator.xr.isSessionSupported('immersive-ar');
+                        debugInfo.push(`WebXR AR: ${arSupported ? 'SÍ' : 'NO'}`);
+                        this.deviceInfo.arDebugInfo.webXRSupported = arSupported;
+                        return arSupported;
+                    }
+                } catch (e) {
+                    debugInfo.push(`WebXR error: ${e.message}`);
+                }
+                
+                // Si WebXR falla, asumir compatible si cumple requisitos
+                return true;
+            } else {
+                debugInfo.push('No cumple requisitos mínimos');
                 this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
                 return false;
             }
-            
-            debugInfo.push(`Android ${androidVersion} + Chrome ${chromeVersion}: OK para ARCore`);
-            this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-            return true;
         }
         
-        // Para iOS: necesita Safari y iOS 12+
-        if (isIOS) {
-            if (!isSafari) {
-                debugInfo.push('iOS requiere Safari para AR');
-                this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-                return false;
-            }
+        // 4. Verificar iOS + Safari
+        if (this.deviceInfo.os === 'iOS') {
+            const iosVersion = parseFloat(this.deviceInfo.arDebugInfo.iosVersion || 0);
             
-            const iosVersion = this.deviceInfo.arDebugInfo.iosVersion || '0';
-            const iosVersionNum = parseFloat(iosVersion);
-            if (iosVersionNum < 12.0) {
-                debugInfo.push(`iOS ${iosVersionNum} < 12.0 (mínimo requerido)`);
+            if (iosVersion >= 12.0 && this.deviceInfo.browser === 'Safari') {
+                debugInfo.push(`iOS ${iosVersion} + Safari: OK para ARKit`);
                 this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-                return false;
+                return true;
             }
-            
-            debugInfo.push(`iOS ${iosVersionNum} + Safari: OK para ARKit`);
-            this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-            return true;
         }
         
-        // Otros dispositivos - intentar detección de WebXR
-        debugInfo.push('OS no reconocido, intentando WebXR API');
+        debugInfo.push('No compatible');
         this.deviceInfo.arDebugInfo.arCheckSteps = debugInfo;
-        
-        // Intentar detección mediante WebXR API
-        return this.checkWebXRSupport();
-    }
-
-    async checkWebXRSupport() {
-        // Verificación usando WebXR API (más precisa)
-        if ('xr' in navigator) {
-            try {
-                // Verificar si hay sesiones AR disponibles
-                const supported = await navigator.xr.isSessionSupported('immersive-ar');
-                console.log('WebXR immersive-ar support:', supported);
-                this.deviceInfo.arDebugInfo.webXRSupported = supported;
-                return supported;
-            } catch (error) {
-                console.log('WebXR check failed:', error);
-                this.deviceInfo.arDebugInfo.webXRError = error.message;
-                return false;
-            }
-        }
-        
-        this.deviceInfo.arDebugInfo.webXRSupported = false;
         return false;
     }
 
@@ -296,18 +349,18 @@ class DeviceDetector {
             case 'mobile':
                 deviceIcon = '📱';
                 deviceText = this.deviceInfo.arSupported ? 
-                    `Móvil compatible con AR (${this.deviceInfo.os})` : 
+                    `Móvil compatible con AR` : 
                     `Móvil - AR no disponible`;
                 break;
             case 'tablet':
                 deviceIcon = '📱';
                 deviceText = this.deviceInfo.arSupported ? 
-                    `Tablet compatible con AR (${this.deviceInfo.os})` : 
+                    `Tablet compatible con AR` : 
                     `Tablet - AR no disponible`;
                 break;
             default:
                 deviceIcon = '💻';
-                deviceText = 'PC/Laptop - Usa vista 3D';
+                deviceText = 'PC/Laptop - Vista 3D';
         }
         
         deviceInfoElement.innerHTML = `<i class="fas fa-${this.deviceInfo.type === 'desktop' ? 'desktop' : 'mobile-alt'}"></i> <span>${deviceText}</span>`;
@@ -321,7 +374,6 @@ class DeviceDetector {
                 <p><strong>Realidad Aumentada:</strong> <span style="color: ${this.deviceInfo.arSupported ? '#25D366' : '#FF4757'}; font-weight: bold;">${this.deviceInfo.arSupported ? 'COMPATIBLE ✓' : 'NO COMPATIBLE ✗'}</span></p>
             `;
             
-            // Mostrar información de debug
             if (this.deviceInfo.arDebugInfo.arCheckSteps) {
                 compatibilityHTML += `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px; font-size: 12px;">`;
                 compatibilityHTML += `<strong>Proceso de verificación:</strong><ul>`;
@@ -340,16 +392,16 @@ class DeviceDetector {
             if (!this.deviceInfo.arSupported && this.deviceInfo.type !== 'desktop') {
                 compatibilityHTML += `
                     <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
-                        <strong><i class="fas fa-lightbulb"></i> Consejos para activar AR:</strong>
+                        <strong><i class="fas fa-lightbulb"></i> Solución para Xiaomi:</strong>
                         <ul style="margin: 5px 0 0 15px; font-size: 0.9rem;">
-                            <li>Asegúrate de usar ${this.deviceInfo.os === 'iOS' ? 'Safari' : 'Chrome'} actualizado</li>
-                            <li>Android necesita versión 7.0+ y Chrome 81+</li>
-                            <li>iOS necesita versión 12.0+ y Safari</li>
-                            <li>Permite el acceso a la cámara cuando se solicite</li>
-                            ${this.deviceInfo.os === 'Android' ? '<li>Verifica que ARCore esté instalado desde Play Store</li>' : ''}
+                            <li><strong>1.</strong> Abre Google Play Store</li>
+                            <li><strong>2.</strong> Busca "Google Play Services for AR" (ARCore)</li>
+                            <li><strong>3.</strong> Instálalo o actualízalo</li>
+                            <li><strong>4.</strong> Reinicia Chrome y prueba de nuevo</li>
+                            <li><strong>5.</strong> Si no funciona, prueba con Firefox para Android</li>
                         </ul>
-                        <button id="force-ar-btn" style="margin-top: 10px; background: #8b7355; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
-                            <i class="fas fa-bolt"></i> Forzar activación de AR (experimental)
+                        <button id="test-ar-btn" style="margin-top: 10px; background: #8b7355; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%;">
+                            <i class="fas fa-bolt"></i> Probar compatibilidad AR ahora
                         </button>
                     </div>
                 `;
@@ -357,58 +409,30 @@ class DeviceDetector {
             
             compatibilityDetails.innerHTML = compatibilityHTML;
             
-            // Añadir evento al botón de forzar AR
-            const forceArBtn = document.getElementById('force-ar-btn');
-            if (forceArBtn) {
-                forceArBtn.addEventListener('click', () => {
-                    this.forceEnableAR();
+            // Añadir evento al botón de prueba
+            const testArBtn = document.getElementById('test-ar-btn');
+            if (testArBtn) {
+                testArBtn.addEventListener('click', () => {
+                    this.runARTest();
                 });
             }
         }
         
-        // Actualizar estado global
         window.deviceInfo = this.deviceInfo;
     }
 
-    updateAllARButtons() {
-        // Actualizar todos los botones AR en la página
-        const arButtons = document.querySelectorAll('.btn-ar');
-        arButtons.forEach(btn => {
-            const isEnabled = this.deviceInfo.arSupported && this.deviceInfo.modelViewerSupported;
-            
-            if (isEnabled) {
-                btn.classList.remove('btn-disabled');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-cube"></i> Ver en Realidad Aumentada';
-                btn.setAttribute('aria-label', 'Ver esta obra en Realidad Aumentada');
-            } else {
-                btn.classList.add('btn-disabled');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-cube"></i> AR no disponible';
-                btn.setAttribute('aria-label', 'Realidad Aumentada no disponible en este dispositivo');
-            }
-        });
-    }
-
-    forceEnableAR() {
-        // Forzar la activación de AR (modo experimental)
-        this.deviceInfo.arSupported = true;
-        this.updateUI();
-        this.updateAllARButtons();
+    runARTest() {
+        const testUrl = 'https://modelviewer.dev/examples/ar.html';
+        const testWindow = window.open(testUrl, '_blank');
         
-        // Mostrar mensaje
-        alert("AR forzado activado (modo experimental).\n\nSi tu dispositivo realmente es compatible, el botón AR debería funcionar ahora.\nSi no funciona, es posible que tu dispositivo/navegador no sea compatible con WebAR.");
-        
-        console.log('AR forzado activado. Device info:', this.deviceInfo);
-    }
-
-    getDeviceInfo() {
-        return this.deviceInfo;
+        if (!testWindow) {
+            alert('Por favor, permite ventanas emergentes para probar AR.\n\nO ve manualmente a: https://modelviewer.dev/examples/ar.html');
+        }
     }
 }
 
 // =============================================
-// SISTEMA DE AUDIO PARA LAS ESCULTURAS
+// SISTEMA DE AUDIO
 // =============================================
 
 class AudioManager {
@@ -423,7 +447,6 @@ class AudioManager {
         const audio = new Audio(audioSrc);
         audio.preload = 'metadata';
         
-        // Configurar eventos
         audio.addEventListener('loadedmetadata', () => {
             this.updateAudioDisplay(sculptureId, 0, audio.duration);
         });
@@ -441,12 +464,10 @@ class AudioManager {
     }
 
     playAudio(sculptureId) {
-        // Si hay un audio reproduciéndose, detenerlo
         if (this.currentAudio && this.currentAudioId !== sculptureId) {
             this.pauseAudio(this.currentAudioId);
         }
         
-        // Obtener o crear el elemento de audio
         let audio = this.audioElements[sculptureId];
         if (!audio) {
             const sculpture = galleryData.find(s => s.id === sculptureId);
@@ -455,15 +476,13 @@ class AudioManager {
             audio = this.createAudioElement(sculptureId, sculpture.audioSrc);
         }
         
-        // Reproducir audio
         audio.play().then(() => {
             this.currentAudio = audio;
             this.currentAudioId = sculptureId;
             this.isPlaying = true;
             this.updatePlayButton(sculptureId, true);
         }).catch(error => {
-            console.error('Error al reproducir audio:', error);
-            // Fallback: mostrar transcripción si el audio falla
+            console.error('Error audio:', error);
             this.showTranscript(sculptureId);
         });
     }
@@ -538,7 +557,6 @@ class AudioManager {
         const sculpture = galleryData.find(s => s.id === sculptureId);
         if (!sculpture) return;
         
-        // Crear o mostrar elemento de transcripción
         let transcriptEl = document.querySelector(`#transcript-${sculptureId}`);
         
         if (!transcriptEl) {
@@ -549,6 +567,11 @@ class AudioManager {
                 transcriptEl.className = 'audio-transcript';
                 transcriptEl.textContent = sculpture.audioTranscript;
                 audioControls.parentNode.insertBefore(transcriptEl, audioControls.nextSibling);
+                
+                // Auto-ocultar después de 10 segundos
+                setTimeout(() => {
+                    transcriptEl.style.display = 'none';
+                }, 10000);
             }
         } else {
             transcriptEl.style.display = 'block';
@@ -557,124 +580,132 @@ class AudioManager {
 }
 
 // =============================================
-// RENDERIZADO DE LA GALERÍA
+// RENDERIZADOR DE GALERÍA MEJORADO
 // =============================================
 
 class GalleryRenderer {
     constructor() {
         this.audioManager = new AudioManager();
-        this.deviceDetector = null;
-        this.modelViewerAvailable = false;
-        this.renderedCards = new Set();
-    }
-
-    init() {
+        this.modelViewerManager = new ModelViewerManager();
         this.deviceDetector = new DeviceDetector();
-        this.checkModelViewerAvailability();
-        this.renderGallery();
-        this.initModal();
-        this.setupEventListeners();
-        
-        // Intentar verificar Model Viewer después de un tiempo
-        setTimeout(() => {
-            this.checkModelViewerAvailability();
-            this.updateARButtons();
-        }, 1000);
+        this.initialized = false;
     }
 
-    checkModelViewerAvailability() {
-        const wasAvailable = this.modelViewerAvailable;
-        this.modelViewerAvailable = 'modelViewer' in window || 
-                                   document.querySelector('model-viewer') !== null;
+    async init() {
+        if (this.initialized) return;
         
-        if (this.modelViewerAvailable && !wasAvailable) {
-            console.log('Model Viewer cargado correctamente');
-            this.updateARButtons();
+        console.log('🚀 Inicializando Galería Virtual AR...');
+        
+        try {
+            // 1. Inicializar Model Viewer primero
+            const modelViewerLoaded = await this.modelViewerManager.initialize();
+            console.log(`Model Viewer: ${modelViewerLoaded ? 'CARGADO' : 'NO DISPONIBLE'}`);
             
-            // Si tenemos modelos ya renderizados, actualizar sus botones AR
-            this.renderedCards.forEach(id => {
-                this.updateModelViewerInstance(id);
-            });
+            // 2. Detectar dispositivo
+            const deviceInfo = await this.deviceDetector.init(this.modelViewerManager);
+            
+            // 3. Renderizar galería
+            this.renderGallery(deviceInfo);
+            
+            // 4. Configurar eventos
+            this.initModal();
+            this.setupEventListeners();
+            
+            // 5. Verificación final
+            this.runFinalChecks();
+            
+            this.initialized = true;
+            console.log('✅ Galería inicializada correctamente');
+            
+        } catch (error) {
+            console.error('❌ Error inicializando galería:', error);
+            this.showErrorFallback();
         }
-        
-        return this.modelViewerAvailable;
     }
 
-    renderGallery() {
+    renderGallery(deviceInfo) {
         const container = document.getElementById('sculptures-container');
         if (!container) return;
         
         container.innerHTML = '';
         
         galleryData.forEach(sculpture => {
-            const sculptureCard = this.createSculptureCard(sculpture);
+            const sculptureCard = this.createSculptureCard(sculpture, deviceInfo);
             container.appendChild(sculptureCard);
-            this.renderedCards.add(sculpture.id);
         });
     }
 
-    createSculptureCard(sculpture) {
-        const deviceInfo = window.deviceInfo || { arSupported: false };
-        
+    createSculptureCard(sculpture, deviceInfo) {
         const card = document.createElement('article');
         card.className = 'sculpture-card';
         card.dataset.id = sculpture.id;
         
-        // Determinar si mostrar botón AR
-        const showARButton = deviceInfo.arSupported && this.modelViewerAvailable;
+        const modelViewerAvailable = deviceInfo.modelViewerSupported;
+        const arSupported = deviceInfo.arSupported && modelViewerAvailable;
         
-        // Configuración del model-viewer
-        const modelViewerAttributes = this.modelViewerAvailable ? `
-            ar 
-            ar-modes="webxr scene-viewer quick-look"
-            camera-controls 
-            touch-action="pan-y"
-            camera-orbit="${sculpture.cameraOrbit}"
-            camera-target="${sculpture.cameraTarget}"
-            auto-rotate 
-            rotation-per-second="30deg"
-            shadow-intensity="1"
-            exposure="1"
-            environment-image="neutral"
-        ` : '';
+        // HTML del model-viewer o fallback
+        let modelViewerHTML = '';
+        
+        if (modelViewerAvailable) {
+            modelViewerHTML = `
+                <model-viewer 
+                    id="model-${sculpture.id}"
+                    src="${sculpture.modelSrc}"
+                    alt="${sculpture.title} - ${sculpture.artist}"
+                    ${arSupported ? 'ar ar-modes="webxr scene-viewer quick-look"' : ''}
+                    camera-controls 
+                    touch-action="pan-y"
+                    camera-orbit="${sculpture.cameraOrbit}"
+                    camera-target="${sculpture.cameraTarget}"
+                    auto-rotate 
+                    rotation-per-second="30deg"
+                    shadow-intensity="1"
+                    exposure="1"
+                    environment-image="neutral"
+                    style="width: 100%; height: 100%;">
+                    
+                    <div slot="progress-bar" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f8f8;">
+                        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #8b7355; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 15px; color: #666;">Cargando modelo 3D...</p>
+                    </div>
+                    
+                    ${arSupported ? `
+                    <button slot="ar-button" style="background: #8b7355; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; cursor: pointer; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+                        <i class="fas fa-cube"></i> Ver en Realidad Aumentada
+                    </button>
+                    ` : ''}
+                    
+                    <div slot="ar-failure" style="text-align: center; padding: 20px; color: #666;">
+                        <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>AR no disponible en este dispositivo</p>
+                    </div>
+                </model-viewer>
+            `;
+        } else {
+            modelViewerHTML = `
+                <div class="model-viewer-fallback">
+                    <div class="fallback-content">
+                        <i class="fas fa-cube" style="font-size: 3rem; color: #8b7355; margin-bottom: 1rem;"></i>
+                        <h4>Vista 3D no disponible</h4>
+                        <p>El visor 3D no se pudo cargar. Esto puede deberse a:</p>
+                        <ul style="text-align: left; margin: 10px 0; font-size: 0.9rem;">
+                            <li>Conexión a Internet lenta</li>
+                            <li>Bloqueo de scripts por el navegador</li>
+                            <li>Falta de soporte para WebGL</li>
+                        </ul>
+                        <button class="retry-load-btn" data-model-id="${sculpture.id}" 
+                                style="background: #8b7355; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px;">
+                            <i class="fas fa-redo"></i> Reintentar carga
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
         
         card.innerHTML = `
             <div class="sculpture-media">
                 <div class="model-viewer-container" id="container-${sculpture.id}">
-                    ${this.modelViewerAvailable ? `
-                    <model-viewer 
-                        id="model-${sculpture.id}"
-                        src="${sculpture.modelSrc}"
-                        alt="${sculpture.title} - ${sculpture.artist}"
-                        ${modelViewerAttributes}
-                        style="width: 100%; height: 100%;">
-                        
-                        <div class="model-loading" slot="progress-bar">
-                            <div class="loading-spinner"></div>
-                            <p>Cargando modelo 3D...</p>
-                        </div>
-                        
-                        <button slot="ar-button" class="model-ar-button" ${!showARButton ? 'style="display: none;"' : ''}>
-                            Ver en Realidad Aumentada
-                        </button>
-                        
-                        <div slot="ar-failure" style="text-align: center; padding: 10px;">
-                            <p>AR no disponible en este dispositivo</p>
-                        </div>
-                    </model-viewer>
-                    ` : `
-                    <div class="model-viewer-fallback">
-                        <div class="fallback-content">
-                            <i class="fas fa-cube" style="font-size: 3rem; color: #8b7355; margin-bottom: 1rem;"></i>
-                            <h4>Vista 3D no disponible</h4>
-                            <p>El visor de modelos 3D no se cargó correctamente.</p>
-                            <p>Puedes intentar recargar la página.</p>
-                            <button class="btn btn-ar retry-load-btn" data-model-id="${sculpture.id}" style="margin-top: 1rem;">
-                                <i class="fas fa-redo"></i> Reintentar carga
-                            </button>
-                        </div>
-                    </div>
-                    `}
+                    ${modelViewerHTML}
                 </div>
             </div>
             
@@ -698,10 +729,10 @@ class GalleryRenderer {
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn btn-ar ${showARButton ? '' : 'btn-disabled'}" 
+                    <button class="btn ${arSupported ? 'btn-ar' : 'btn-disabled'}" 
                             id="ar-btn-${sculpture.id}"
-                            ${!showARButton ? 'disabled' : ''}>
-                        <i class="fas fa-cube"></i> ${showARButton ? 'Ver en Realidad Aumentada' : 'AR no disponible'}
+                            ${!arSupported ? 'disabled' : ''}>
+                        <i class="fas fa-cube"></i> ${arSupported ? 'Ver en Realidad Aumentada' : 'AR no disponible'}
                     </button>
                     
                     <a class="btn btn-whatsapp" 
@@ -713,87 +744,16 @@ class GalleryRenderer {
             </div>
         `;
         
-        // Configurar eventos después de crear el elemento
+        // Configurar eventos
         setTimeout(() => {
-            this.setupCardEvents(card, sculpture.id);
-        }, 0);
+            this.setupCardEvents(card, sculpture.id, arSupported);
+        }, 100);
         
         return card;
     }
 
-    updateModelViewerInstance(sculptureId) {
-        const container = document.getElementById(`container-${sculptureId}`);
-        if (!container) return;
-        
-        const sculpture = galleryData.find(s => s.id === sculptureId);
-        if (!sculpture) return;
-        
-        // Si Model Viewer ahora está disponible y tenemos un fallback, reemplazarlo
-        if (this.modelViewerAvailable && container.querySelector('.model-viewer-fallback')) {
-            const deviceInfo = window.deviceInfo || { arSupported: false };
-            const showARButton = deviceInfo.arSupported;
-            
-            container.innerHTML = `
-                <model-viewer 
-                    id="model-${sculptureId}"
-                    src="${sculpture.modelSrc}"
-                    alt="${sculpture.title} - ${sculpture.artist}"
-                    ar 
-                    ar-modes="webxr scene-viewer quick-look"
-                    camera-controls 
-                    touch-action="pan-y"
-                    camera-orbit="${sculpture.cameraOrbit}"
-                    camera-target="${sculpture.cameraTarget}"
-                    auto-rotate 
-                    rotation-per-second="30deg"
-                    shadow-intensity="1"
-                    exposure="1"
-                    environment-image="neutral"
-                    style="width: 100%; height: 100%;">
-                    
-                    <div class="model-loading" slot="progress-bar">
-                        <div class="loading-spinner"></div>
-                        <p>Cargando modelo 3D...</p>
-                    </div>
-                    
-                    <button slot="ar-button" class="model-ar-button" ${!showARButton ? 'style="display: none;"' : ''}>
-                        Ver en Realidad Aumentada
-                    </button>
-                    
-                    <div slot="ar-failure" style="text-align: center; padding: 10px;">
-                        <p>AR no disponible en este dispositivo</p>
-                    </div>
-                </model-viewer>
-            `;
-            
-            // Actualizar el botón AR principal
-            this.updateARButtonState(sculptureId, showARButton);
-        }
-    }
-
-    updateARButtons() {
-        galleryData.forEach(sculpture => {
-            this.updateARButtonState(sculpture.id, window.deviceInfo?.arSupported && this.modelViewerAvailable);
-        });
-    }
-
-    updateARButtonState(sculptureId, isEnabled) {
-        const arBtn = document.getElementById(`ar-btn-${sculptureId}`);
-        if (!arBtn) return;
-        
-        if (isEnabled) {
-            arBtn.classList.remove('btn-disabled');
-            arBtn.disabled = false;
-            arBtn.innerHTML = '<i class="fas fa-cube"></i> Ver en Realidad Aumentada';
-        } else {
-            arBtn.classList.add('btn-disabled');
-            arBtn.disabled = true;
-            arBtn.innerHTML = '<i class="fas fa-cube"></i> AR no disponible';
-        }
-    }
-
-    setupCardEvents(card, sculptureId) {
-        // Botón de audio
+    setupCardEvents(card, sculptureId, arSupported) {
+        // Audio
         const playBtn = card.querySelector(`#play-btn-${sculptureId}`);
         if (playBtn) {
             playBtn.addEventListener('click', () => {
@@ -801,15 +761,15 @@ class GalleryRenderer {
             });
         }
         
-        // Botón AR personalizado
+        // AR
         const arBtn = card.querySelector(`#ar-btn-${sculptureId}`);
-        if (arBtn) {
+        if (arBtn && arSupported) {
             arBtn.addEventListener('click', () => {
                 this.activateAR(sculptureId);
             });
         }
         
-        // Control de progreso de audio
+        // Progress bar
         const progressBar = card.querySelector(`.audio-progress`);
         if (progressBar) {
             progressBar.addEventListener('click', (e) => {
@@ -823,158 +783,21 @@ class GalleryRenderer {
             });
         }
         
-        // Botón de reintento para fallback
+        // Botón de reintento
         const retryBtn = card.querySelector('.retry-load-btn');
         if (retryBtn) {
             retryBtn.addEventListener('click', () => {
-                this.retryModelViewerLoad(sculptureId);
+                location.reload();
             });
         }
     }
 
-    retryModelViewerLoad(sculptureId) {
-        modelViewerLoadAttempts++;
-        
-        if (modelViewerLoadAttempts <= MAX_LOAD_ATTEMPTS) {
-            console.log(`Reintento ${modelViewerLoadAttempts} de carga de Model Viewer...`);
-            
-            // Mostrar mensaje de carga
-            const container = document.getElementById(`container-${sculptureId}`);
-            if (container) {
-                container.innerHTML = `
-                    <div class="model-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                        <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #8b7355; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
-                        <p>Cargando Model Viewer... (${modelViewerLoadAttempts}/${MAX_LOAD_ATTEMPTS})</p>
-                    </div>
-                `;
-            }
-            
-            // Intentar cargar Model Viewer de nuevo
-            this.loadModelViewerWithRetry(sculptureId);
-        } else {
-            // Mostrar mensaje de error final
-            const container = document.getElementById(`container-${sculptureId}`);
-            if (container) {
-                container.innerHTML = `
-                    <div class="model-viewer-fallback">
-                        <div class="fallback-content">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff4757; margin-bottom: 1rem;"></i>
-                            <h4>No se pudo cargar el visor 3D</h4>
-                            <p>Por favor, verifica tu conexión a Internet o intenta más tarde.</p>
-                            <p>Puedes contactar al artista para ver imágenes de la obra.</p>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-    }
-
-    loadModelViewerWithRetry(sculptureId) {
-        // Crear un nuevo script para Model Viewer
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
-        script.onload = () => {
-            console.log('Model Viewer cargado con éxito en reintento');
-            isModelViewerLoaded = true;
-            this.modelViewerAvailable = true;
-            this.updateModelViewerInstance(sculptureId);
-        };
-        script.onerror = () => {
-            console.error('Error al cargar Model Viewer en reintento');
-            setTimeout(() => {
-                if (modelViewerLoadAttempts < MAX_LOAD_ATTEMPTS) {
-                    this.retryModelViewerLoad(sculptureId);
-                }
-            }, 2000);
-        };
-        
-        document.head.appendChild(script);
-    }
-
-  activateAR(sculptureId) {
-    if (!this.modelViewerAvailable) {
-        this.showModelViewerError();
-        return;
-    }
-    
-    const modelViewer = document.querySelector(`#model-${sculptureId}`);
-    
-    // Múltiples métodos para activar AR
-    if (modelViewer) {
-        // Método 1: activateAR() nativo
-        if (typeof modelViewer.activateAR === 'function') {
-            console.log('Activando AR con activateAR()');
+    activateAR(sculptureId) {
+        const modelViewer = document.querySelector(`#model-${sculptureId}`);
+        if (modelViewer && typeof modelViewer.activateAR === 'function') {
             modelViewer.activateAR();
-            return;
-        }
-        
-        // Método 2: Intentar con el botón slot
-        const arButton = modelViewer.querySelector('[slot="ar-button"]');
-        if (arButton) {
-            console.log('Activando AR con botón slot');
-            arButton.click();
-            return;
-        }
-        
-        // Método 3: WebXR API directa
-        this.activateWebXR(sculptureId);
-    } else {
-        this.showARInstructions();
-    }
-}
-
-async activateWebXR(sculptureId) {
-    try {
-        if ('xr' in navigator) {
-            const session = await navigator.xr.requestSession('immersive-ar', {
-                requiredFeatures: ['hit-test', 'dom-overlay'],
-                domOverlay: { root: document.body }
-            });
-            
-            console.log('Sesión WebXR iniciada:', session);
-            // Aquí integrarías el modelo 3D con WebXR API
-            alert('WebXR AR activado. Para una experiencia completa, usa el botón AR nativo de model-viewer.');
         } else {
             this.showARInstructions();
-        }
-    } catch (error) {
-        console.error('Error al activar WebXR:', error);
-        this.showARInstructions();
-    }
-}
-
-    showModelViewerError() {
-        const modal = document.getElementById('ar-modal');
-        if (modal) {
-            // Asegurar que el modal muestre información sobre el error
-            const compatibilityDetails = document.getElementById('compatibility-details');
-            if (compatibilityDetails) {
-                compatibilityDetails.innerHTML += `
-                    <p style="color: #ff4757; margin-top: 1rem;">
-                        <strong>Error:</strong> Model Viewer no se cargó. 
-                        <button id="retry-global-btn" style="background: #8b7355; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-left: 10px;">
-                            Reintentar
-                        </button>
-                    </p>
-                `;
-                
-                document.getElementById('retry-global-btn').addEventListener('click', () => {
-                    this.retryModelViewerLoad(galleryData[0].id);
-                    modal.classList.remove('active');
-                });
-            }
-            
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    showARInstructions() {
-        const modal = document.getElementById('ar-modal');
-        if (modal) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
         }
     }
 
@@ -997,7 +820,6 @@ async activateWebXR(sculptureId) {
             });
         }
         
-        // Cerrar modal al hacer clic fuera
         if (modal) {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -1007,26 +829,20 @@ async activateWebXR(sculptureId) {
             });
         }
         
-        // Enlace de privacidad
         const privacyLink = document.getElementById('privacy-link');
         if (privacyLink) {
             privacyLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                alert("Política de privacidad: Esta galería no recopila datos personales. Los modelos 3D se cargan desde servidores externos. La funcionalidad AR requiere acceso a la cámara, pero no se almacenan imágenes ni videos.");
+                alert("Esta galería virtual no recopila datos personales. Los modelos 3D se cargan desde servidores de Google. Para usar AR necesitarás permitir acceso a la cámara, pero no se almacenan imágenes.");
             });
         }
     }
 
     setupEventListeners() {
-        // Detectar cambios en la orientación/ventana
         window.addEventListener('resize', () => {
-            // Actualizar detección de dispositivo si es necesario
-            if (this.deviceDetector) {
-                this.deviceDetector.updateUI();
-            }
+            // Re-check device orientation if needed
         });
         
-        // Mejorar manejo de teclado para accesibilidad
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const modal = document.getElementById('ar-modal');
@@ -1036,86 +852,179 @@ async activateWebXR(sculptureId) {
                 }
             }
         });
+    }
+
+    runFinalChecks() {
+        console.log('🔍 Ejecutando verificaciones finales...');
         
-        // Escuchar eventos personalizados de Model Viewer si están disponibles
-        if (this.modelViewerAvailable) {
-            document.addEventListener('model-viewer-ready', () => {
-                console.log('Model Viewer listo');
-                this.modelViewerAvailable = true;
-                this.updateARButtons();
-            });
+        // Verificar WebGL (necesario para 3D)
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        const hasWebGL = !!gl;
+        
+        console.log(`WebGL: ${hasWebGL ? 'DISPONIBLE' : 'NO DISPONIBLE'}`);
+        
+        if (!hasWebGL) {
+            this.showWebGLError();
+        }
+        
+        // Verificar si estamos en HTTPS (necesario para cámara)
+        const isHTTPS = window.location.protocol === 'https:';
+        console.log(`HTTPS: ${isHTTPS ? 'SÍ' : 'NO'}`);
+        
+        if (!isHTTPS && window.deviceInfo?.arSupported) {
+            console.warn('AR puede no funcionar sin HTTPS');
+        }
+    }
+
+    showWebGLError() {
+        const cards = document.querySelectorAll('.sculpture-card');
+        cards.forEach(card => {
+            const fallback = card.querySelector('.model-viewer-fallback');
+            if (fallback) {
+                const content = fallback.querySelector('.fallback-content');
+                if (content) {
+                    content.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff4757; margin-bottom: 1rem;"></i>
+                        <h4>WebGL no disponible</h4>
+                        <p>Tu navegador no soporta gráficos 3D necesarios para esta galería.</p>
+                        <p>Por favor:</p>
+                        <ul style="text-align: left; margin: 10px 0; font-size: 0.9rem;">
+                            <li>Actualiza Chrome/Firefox/Safari</li>
+                            <li>Habilita WebGL en configuraciones</li>
+                            <li>Prueba con otro navegador</li>
+                        </ul>
+                    `;
+                }
+            }
+        });
+    }
+
+    showErrorFallback() {
+        const container = document.getElementById('sculptures-container');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; grid-column: 1 / -1;">
+                <i class="fas fa-exclamation-circle" style="font-size: 4rem; color: #8b7355; margin-bottom: 20px;"></i>
+                <h2>Error al cargar la galería</h2>
+                <p>No se pudo inicializar la galería virtual. Esto puede deberse a:</p>
+                <ul style="text-align: left; max-width: 500px; margin: 20px auto; padding-left: 20px;">
+                    <li>Problemas de conexión a Internet</li>
+                    <li>Bloqueo de scripts por el navegador</li>
+                    <li>Falta de soporte para tecnologías necesarias</li>
+                </ul>
+                <button onclick="location.reload()" 
+                        style="background: #8b7355; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1rem; cursor: pointer; margin-top: 20px;">
+                    <i class="fas fa-redo"></i> Reintentar
+                </button>
+                <p style="margin-top: 30px; font-size: 0.9rem; color: #666;">
+                    Si el problema persiste, contacta al soporte técnico.
+                </p>
+            </div>
+        `;
+    }
+
+    showARInstructions() {
+        const modal = document.getElementById('ar-modal');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
     }
 }
 
 // =============================================
-// INICIALIZACIÓN DE LA APLICACIÓN
+// INICIALIZACIÓN PRINCIPAL
 // =============================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM cargado, iniciando galería...');
+// Esperar a que todo esté listo
+window.addEventListener('DOMContentLoaded', async () => {
+    console.log('🌐 DOM listo, iniciando aplicación...');
+    
+    // Pequeña espera para asegurar carga de recursos
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     // Inicializar la galería
     const gallery = new GalleryRenderer();
-    gallery.init();
     
-    // Hacer disponible globalmente para depuración
-    window.galleryApp = gallery;
-    
-    // Verificar periódicamente si Model Viewer se cargó
-    const checkModelViewerInterval = setInterval(() => {
-        if (gallery.modelViewerAvailable) {
-            clearInterval(checkModelViewerInterval);
-            console.log('Model Viewer verificado como disponible');
-        } else if (modelViewerLoadAttempts >= MAX_LOAD_ATTEMPTS) {
-            clearInterval(checkModelViewerInterval);
-            console.log('Se excedieron los intentos de carga de Model Viewer');
-        } else {
-            gallery.checkModelViewerAvailability();
+    try {
+        await gallery.init();
+        console.log('🎉 Aplicación inicializada con éxito');
+    } catch (error) {
+        console.error('💥 Error crítico:', error);
+        
+        // Mostrar error al usuario
+        const container = document.getElementById('sculptures-container');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 50px 20px;">
+                    <h3 style="color: #ff4757;">Error de inicialización</h3>
+                    <p>Por favor, recarga la página o intenta más tarde.</p>
+                    <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px;">
+                        Recargar página
+                    </button>
+                </div>
+            `;
         }
-    }, 500);
-    
-    // Inicializar tooltips para accesibilidad
-    initAccessibilityFeatures();
+    }
 });
 
 // =============================================
-// FUNCIONES AUXILIARES
+// FUNCIONES GLOBALES PARA DEBUG
 // =============================================
 
-function initAccessibilityFeatures() {
-    // Añadir labels a los botones que no los tengan
-    const audioButtons = document.querySelectorAll('.audio-btn');
-    audioButtons.forEach(btn => {
-        if (!btn.getAttribute('aria-label')) {
-            btn.setAttribute('aria-label', 'Reproducir explicación de la obra');
-        }
-    });
+// Función para probar Model Viewer manualmente
+window.testModelViewer = function() {
+    console.log('🧪 Probando Model Viewer...');
     
-    // Mejorar navegación por teclado
-    document.addEventListener('keyup', (e) => {
-        if (e.key === 'Tab') {
-            // Asegurar que los elementos enfocados sean visibles
-            const focused = document.activeElement;
-            if (focused && focused.scrollIntoViewIfNeeded) {
-                focused.scrollIntoViewIfNeeded({ behavior: 'smooth', block: 'nearest' });
-            }
+    const testDiv = document.createElement('div');
+    testDiv.innerHTML = `
+        <model-viewer 
+            src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+            alt="Test"
+            style="width: 200px; height: 200px;"
+            camera-controls>
+        </model-viewer>
+    `;
+    testDiv.style.position = 'fixed';
+    testDiv.style.bottom = '10px';
+    testDiv.style.right = '10px';
+    testDiv.style.zIndex = '99999';
+    testDiv.style.background = 'white';
+    testDiv.style.padding = '10px';
+    testDiv.style.borderRadius = '5px';
+    testDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+    
+    document.body.appendChild(testDiv);
+    
+    setTimeout(() => {
+        const mv = testDiv.querySelector('model-viewer');
+        console.log('Test Model Viewer:', mv ? 'CREADO' : 'NO CREADO');
+        if (mv) {
+            console.log('Model Viewer properties:', Object.keys(mv).slice(0, 10));
         }
-    });
-}
+    }, 1000);
+};
 
-// Función para verificar la compatibilidad con Web Speech API (opcional)
-function checkSpeechSupport() {
-    if ('speechSynthesis' in window) {
-        console.log('Web Speech API está soportada');
-        return true;
-    } else {
-        console.log('Web Speech API no está soportada en este navegador');
-        return false;
-    }
-}
+// Función para verificar estado
+window.checkGalleryStatus = function() {
+    const status = {
+        deviceInfo: window.deviceInfo,
+        modelViewer: 'modelViewer' in window,
+        webGL: (() => {
+            const canvas = document.createElement('canvas');
+            return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        })(),
+        https: window.location.protocol === 'https:',
+        userAgent: navigator.userAgent
+    };
+    
+    console.log('📊 Estado de la galería:', status);
+    return status;
+};
 
-// Añadir estilo para el spinner de carga
+// Añadir estilos dinámicos para el spinner
 const style = document.createElement('style');
 style.textContent = `
     @keyframes spin {
@@ -1129,98 +1038,14 @@ style.textContent = `
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #f8f8f8;
+        background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
         border-radius: 8px;
+        padding: 20px;
     }
     
     .fallback-content {
         text-align: center;
-        padding: 2rem;
-        color: #666;
-    }
-    
-    .model-loading {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #f8f8f8;
-    }
-    
-    .loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #8b7355;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
+        max-width: 300px;
     }
 `;
 document.head.appendChild(style);
-
-// Exportar para uso en consola (depuración)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { DeviceDetector, AudioManager, GalleryRenderer };
-}
-
-// DIAGNÓSTICO EN TIEMPO REAL
-function runARDiagnostic() {
-    console.log('=== DIAGNÓSTICO AR ===');
-    console.log('User Agent:', navigator.userAgent);
-    console.log('Platform:', navigator.platform);
-    console.log('Model Viewer loaded:', 'modelViewer' in window);
-    
-    // Verificar características específicas
-    const tests = {
-        'WebXR': 'xr' in navigator,
-        'getGamepads': 'getGamepads' in navigator,
-        'MediaDevices': 'mediaDevices' in navigator,
-        'Permissions API': 'permissions' in navigator,
-        'HTTPS': window.location.protocol === 'https:'
-    };
-    
-    Object.entries(tests).forEach(([name, result]) => {
-        console.log(`${name}: ${result ? '✓' : '✗'}`);
-    });
-    
-    // Intentar detectar ARCore/ARKit específicamente
-    if (navigator.userAgent.includes('Android')) {
-        console.log('Dispositivo: Android');
-        // Verificar si ARCore está disponible
-        const arcoreCheck = document.createElement('div');
-        arcoreCheck.style.display = 'none';
-        document.body.appendChild(arcoreCheck);
-        
-        const sceneViewerIntent = `intent://arvr.google.com/scene-viewer/1.0?file=https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
-        
-        console.log('ARCore intent disponible:', sceneViewerIntent.length > 0);
-    }
-    
-    console.log('=== FIN DIAGNÓSTICO ===');
-    
-    // Mostrar botón de diagnóstico en página
-    const diagBtn = document.createElement('button');
-    diagBtn.textContent = '🛠 Diagnóstico AR';
-    diagBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:10000;background:#8b7355;color:white;border:none;padding:8px 12px;border-radius:4px;font-size:12px;';
-    diagBtn.onclick = () => {
-        const info = window.deviceInfo || {};
-        alert(`DIAGNÓSTICO AR:\n\n` +
-              `OS: ${info.os || 'desconocido'}\n` +
-              `Navegador: ${info.browser || 'desconocido'}\n` +
-              `AR Compatible: ${info.arSupported ? 'SÍ' : 'NO'}\n` +
-              `Model Viewer: ${info.modelViewerSupported ? 'Cargado' : 'No cargado'}\n\n` +
-              `User Agent:\n${navigator.userAgent}\n\n` +
-              `Para Xiaomi Redmi Note 14:\n` +
-              `1. Actualiza Chrome desde Play Store\n` +
-              `2. Instala "Google Play Services for AR"\n` +
-              `3. Permite cámara en Chrome\n` +
-              `4. Prueba en https://modelviewer.dev para verificar`);
-    };
-    document.body.appendChild(diagBtn);
-}
-
-// Ejecutar diagnóstico después de cargar
-setTimeout(runARDiagnostic, 2000);
