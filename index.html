@@ -2,192 +2,175 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="description" content="Galería virtual de escultura contemporánea de Daniel Guido. Experiencia de realidad aumentada desde el navegador.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Fuentes -->
+    <!-- SEO PROFESIONAL -->
+    <title>Galería Virtual AR | Esculturas Contemporáneas de Daniel Guido</title>
+    <meta name="description" content="Galería virtual innovadora con Realidad Aumentada. Explora esculturas contemporáneas de Daniel Guido en 3D interactivo y RA.">
+    <meta name="keywords" content="esculturas, realidad aumentada, arte contemporáneo, Daniel Guido, galería virtual, WebAR, arte 3D">
+    <meta name="author" content="Galería Virtual AR">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Galería Virtual AR | Experiencia Inmersiva">
+    <meta property="og:description" content="Explora esculturas en Realidad Aumentada desde tu dispositivo">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://galeria-ar.com">
+    <meta property="og:image" content="https://galeria-ar.com/preview.jpg">
+    
+    <!-- Model Viewer (WebAR) -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- A-Frame y AR.js -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Título -->
-    <title>Daniel Guido | Galería de Escultura en Realidad Aumentada</title>
-    
-    <!-- Estilos -->
+    <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 </head>
 <body>
-    <!-- Pantalla de inicio -->
-    <div id="inicio" class="pantalla activa">
-        <header class="cabecera">
-            <h1 class="titulo-artista">Daniel Guido</h1>
-            <h2 class="subtitulo">Galería de Escultura Contemporánea</h2>
-        </header>
-        
-        <main class="contenido-inicio">
-            <div class="descripcion">
-                <p class="texto-descripcion">
-                    Esta galería existe solo cuando la observas. 
-                    Una exposición virtual de esculturas que aparecen en tu espacio real.
-                </p>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <h1><i class="fas fa-museum"></i> Galería AR</h1>
+                </div>
                 
-                <!-- Imagenes de fondo en la galería -->
-                <div class="galeria-imagenes">
-                    <div class="imagen-container">
-                        <img src="https://www.artsyshark.com/wp-content/uploads/2021/03/Artplacer-Kell-exhibition-photo-2-e1615652369975.jpg" 
-                             alt="Exposición de arte en galería virtual" 
-                             class="imagen-galeria">
+                <div class="nav-info">
+                    <div class="device-info" id="device-info">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Detectando dispositivo...</span>
                     </div>
-                    <div class="imagen-container">
-                        <img src="https://cdn.kunstmatrix.com/resources/assets/pics/artspaces-hero.jpg" 
-                             alt="Interior de galería de arte contemporáneo" 
-                             class="imagen-galeria">
-                    </div>
-                    <div class="imagen-container">
-                        <img src="https://artevirtual.gallery/images/banner_rs.jpg" 
-                             alt="Galería virtual con realidad aumentada" 
-                             class="imagen-galeria">
-                    </div>
-                </div>
-                
-                <div class="instrucciones">
-                    <h3 class="instrucciones-titulo">Para experimentar la galería:</h3>
-                    <ol class="instrucciones-lista">
-                        <li>Busca un espacio despejado</li>
-                        <li>Apunta tu cámara al suelo o a una superficie plana</li>
-                        <li>Mueve el dispositivo lentamente para calibrar</li>
-                    </ol>
-                </div>
-                
-                <div class="info-obra-seleccionada">
-                    <h4 class="titulo-obra">"Umbral Vacío"</h4>
-                    <p class="detalles-obra">2021 · Escultura virtual · Yeso digital</p>
-                    <p class="texto-curatorial">
-                        Guido explora el hueco como materia moldeable. 
-                        Lo que no está define lo que podría estar.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="controles-inicio">
-                <button id="btn-iniciar-ar" class="btn-primario">
-                    <span class="btn-texto">Abrir galería en AR</span>
-                    <span class="btn-icono">↗</span>
-                </button>
-                
-                <button id="btn-info" class="btn-secundario">
-                    Más información
-                </button>
-            </div>
-        </main>
-        
-        <footer class="pie-inicio">
-            <p class="leyenda">Una galería sin dirección física · Solo existe cuando la miras</p>
-            <p class="creditos">© Estudio Daniel Guido · Galería Virtual WebAR</p>
-        </footer>
-    </div>
-    
-    <!-- Contenedor AR -->
-    <div id="contenedor-ar" class="pantalla">
-        <div class="ar-overlay">
-            <div class="ar-header">
-                <button id="btn-volver" class="btn-volver">
-                    ← Volver
-                </button>
-                
-                <div class="info-obra-ar">
-                    <h3 id="titulo-obra-ar">"Umbral Vacío"</h3>
-                    <p id="detalles-obra-ar">2021 · Escultura virtual</p>
-                </div>
-                
-                <div class="ar-controles">
-                    <button id="btn-rotar" class="btn-control">
-                        ↻ Rotar
-                    </button>
-                    <button id="btn-escalar" class="btn-control">
-                        ↕ Escala
-                    </button>
-                    <button id="btn-audio" class="btn-control">
-                        🔊 Audio
+                    <button class="ar-instruction-btn" id="ar-help-btn">
+                        <i class="fas fa-question-circle"></i> Cómo usar AR
                     </button>
                 </div>
-            </div>
-            
-            <div class="ar-instrucciones">
-                <p id="texto-instrucciones">Mueve el dispositivo para encontrar una superficie plana</p>
-                <div class="indicador-carga" id="indicador-carga">
-                    <div class="punto-carga"></div>
-                    <div class="punto-carga"></div>
-                    <div class="punto-carga"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Esculturas Contemporáneas en <span class="highlight">Realidad Aumentada</span></h2>
+                <p>Explora las obras del escultor <strong>Daniel Guido</strong> en una experiencia inmersiva única. Visualiza las piezas en tu espacio físico con tecnología WebAR.</p>
+                
+                <div class="hero-features">
+                    <div class="feature">
+                        <i class="fas fa-vr-cardboard"></i>
+                        <span>RA en navegador</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-headphones"></i>
+                        <span>Audio explicativo</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Compra directa</span>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Escena A-Frame -->
-        <a-scene 
-            embedded 
-            arjs="sourceType: webcam; debugUIEnabled: false;"
-            renderer="antialias: true; alpha: true;"
-            vr-mode-ui="enabled: false">
-            
-            <a-marker preset="hiro" id="marcador">
-                <a-entity 
-                    id="escultura"
-                    gltf-model="https://cdn.glitch.global/ed6b7e8e-7c4c-4e06-b0f3-32c6437c8e5a/sculpture.glb?v=1644356789012"
-                    scale="0.5 0.5 0.5"
-                    position="0 0.5 0"
-                    rotation="0 0 0"
-                    animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
-                </a-entity>
-                
-                <a-circle 
-                    radius="0.3" 
-                    position="0 0.01 0" 
-                    rotation="-90 0 0" 
-                    color="#C4A35A" 
-                    opacity="0.2">
-                </a-circle>
-            </a-marker>
-            
-            <a-entity camera></a-entity>
-        </a-scene>
-    </div>
-    
-    <!-- Modal -->
-    <div id="modal-info" class="modal" aria-hidden="true">
-        <div class="modal-contenido">
-            <button id="btn-cerrar-modal" class="btn-cerrar-modal">
-                ×
-            </button>
-            
-            <h2 class="modal-titulo">Sobre esta galería</h2>
-            
-            <div class="modal-texto">
-                <p>
-                    <strong>Daniel Guido</strong> es un escultor costarricense contemporáneo 
-                    cuya obra explora la relación entre materia y vacío, presencia y ausencia.
-                </p>
-                
-                <h3>Características técnicas:</h3>
-                <ul>
-                    <li>Acceso directo desde navegador móvil</li>
-                    <li>Compatibilidad con iOS y Android</li>
-                    <li>No requiere descargas</li>
-                </ul>
-                
-                <div class="contacto">
-                    <h4>Contacto:</h4>
-                    <p>estudio@danielguido.cr</p>
-                    <p>+506 8888 8888</p>
+    </section>
+
+    <!-- Galería de Esculturas -->
+    <main class="container">
+        <section class="gallery-intro">
+            <h2>Colección de Esculturas</h2>
+            <p>Selecciona una obra para explorarla en 3D interactivo, escuchar la explicación del artista o verla en Realidad Aumentada en tu espacio.</p>
+        </section>
+
+        <div class="sculptures-grid" id="sculptures-container">
+            <!-- Las esculturas se generan dinámicamente con JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal para instrucciones AR -->
+    <div class="modal-overlay" id="ar-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Cómo usar la Realidad Aumentada</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="instruction-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Dispositivo compatible</h4>
+                        <p>Necesitas un teléfono con iOS 12+ (con Safari) o Android 8+ (con Chrome). La función AR se activará automáticamente si tu dispositivo es compatible.</p>
+                    </div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Permisos de cámara</h4>
+                        <p>Al presionar "Ver en RA", se te pedirá permiso para usar la cámara. Es necesario para superponer la escultura en tu entorno.</p>
+                    </div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Interactúa con la obra</h4>
+                        <p>Mueve tu dispositivo para colocar la escultura. Puedes acercarte, alejarte y girar alrededor de ella para apreciar todos los detalles.</p>
+                    </div>
+                </div>
+                <div class="device-compatibility">
+                    <h4><i class="fas fa-mobile-alt"></i> Estado de tu dispositivo:</h4>
+                    <div id="compatibility-details">
+                        <!-- Información dinámica de compatibilidad -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-museum"></i> Galería Virtual AR</h3>
+                    <p>Una experiencia innovadora que fusiona arte tradicional con tecnología de vanguardia. Exhibición y venta de esculturas contemporáneas.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto Artista</h3>
+                    <p><strong>Daniel Guido</strong></p>
+                    <p>Escultor contemporáneo especializado en formas orgánicas y materiales mixtos.</p>
+                    <a href="https://wa.me/50612345678?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual" 
+                       class="whatsapp-btn" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
+                    </a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Tecnologías</h3>
+                    <div class="tech-badges">
+                        <span class="badge">WebAR</span>
+                        <span class="badge">HTML5</span>
+                        <span class="badge">CSS3 Grid</span>
+                        <span class="badge">JavaScript ES6+</span>
+                        <span class="badge">Model Viewer</span>
+                        <span class="badge">Web Speech API</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Galería Virtual AR. Todos los derechos reservados. | <a href="#" id="privacy-link">Política de privacidad</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="script.js"></script>
 </body>
 </html>

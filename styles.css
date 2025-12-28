@@ -1,673 +1,769 @@
-/* RESET Y BASE - MOBILE FIRST */
+/* RESET Y CONFIGURACIÓN BASE */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    background: #fff;
-    color: #2C2C2C;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+:root {
+    /* Colores neutros - inspiración museística */
+    --color-primary: #1a1a1a;
+    --color-secondary: #333333;
+    --color-accent: #8b7355; /* Color terracota/arcilla */
+    --color-light: #f8f8f8;
+    --color-white: #ffffff;
+    --color-gray: #e0e0e0;
+    --color-dark-gray: #777777;
+    
+    /* Tipografía */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    /* Espaciado */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2.5rem;
+    --spacing-xl: 4rem;
+    
+    /* Bordes */
+    --border-radius: 8px;
+    --border-radius-lg: 16px;
+    
+    /* Sombras */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-heavy: 0 12px 36px rgba(0, 0, 0, 0.15);
+    
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 
-/* PANTALLAS */
-.pantalla {
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-primary);
+    background-color: var(--color-light);
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* TIPOGRAFÍA */
+h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: var(--spacing-sm);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+
+p { margin-bottom: var(--spacing-sm); }
+
+.highlight {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* HEADER */
+.main-header {
+    background-color: var(--color-white);
+    box-shadow: var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: var(--spacing-sm) 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0;
+    color: var(--color-primary);
+}
+
+.logo i {
+    color: var(--color-accent);
+    margin-right: var(--spacing-xs);
+}
+
+.nav-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.device-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-gray);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+}
+
+.device-info i {
+    color: var(--color-accent);
+}
+
+.ar-instruction-btn {
+    background-color: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.ar-instruction-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+}
+
+/* HERO SECTION */
+.hero {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(51, 51, 51, 0.85) 100%);
+    color: var(--color-white);
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    display: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M20,20 L80,20 L80,80 L20,80 Z" stroke="%238b7355" stroke-width="1" fill="none"/></svg>');
+    opacity: 0.1;
+    z-index: 0;
 }
 
-.pantalla.activa {
-    display: block;
-}
-
-/* PANTALLA INICIO */
-#inicio {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 20px 15px;
-}
-
-.cabecera {
+.hero-content {
+    position: relative;
+    z-index: 1;
     text-align: center;
-    margin-bottom: 25px;
-    padding-top: 10px;
-}
-
-.titulo-artista {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 500;
-    color: #2C2C2C;
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.subtitulo {
-    font-size: 14px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 400;
-}
-
-.contenido-inicio {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-width: 500px;
+    max-width: 800px;
     margin: 0 auto;
-    width: 100%;
 }
 
-.descripcion {
-    flex: 1;
+.hero h2 {
+    font-size: 2.8rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-white);
 }
 
-.texto-descripcion {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #444;
-    margin-bottom: 25px;
-    text-align: center;
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-lg);
+    color: rgba(255, 255, 255, 0.9);
 }
 
-/* GALERIA DE IMAGENES */
-.galeria-imagenes {
+.hero-features {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.feature {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-bottom: 25px;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
-.imagen-container {
-    width: 100%;
-    height: 180px;
-    border-radius: 12px;
+.feature i {
+    font-size: 2rem;
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-xs);
+}
+
+.feature span {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* GALERÍA */
+.gallery-intro {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: 0 var(--spacing-md);
+}
+
+.gallery-intro h2 {
+    position: relative;
+    display: inline-block;
+    margin-bottom: var(--spacing-sm);
+}
+
+.gallery-intro h2::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--color-accent);
+}
+
+.gallery-intro p {
+    max-width: 700px;
+    margin: 0 auto;
+    color: var(--color-dark-gray);
+}
+
+/* GRID DE ESCULTURAS */
+.sculptures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* TARJETAS DE ESCULTURA */
+.sculpture-card {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.imagen-galeria {
+.sculpture-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+}
+
+.sculpture-media {
+    position: relative;
+    height: 280px;
+    background-color: var(--color-gray);
+    overflow: hidden;
+}
+
+.model-viewer-container {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: block;
 }
 
-.instrucciones {
-    background: #f8f8f8;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
+model-viewer {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    --poster-color: transparent;
 }
 
-.instrucciones-titulo {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #2C2C2C;
-}
-
-.instrucciones-lista {
-    padding-left: 20px;
-    color: #666;
-}
-
-.instrucciones-lista li {
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-.info-obra-seleccionada {
-    text-align: center;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #eee;
-    margin-bottom: 25px;
-}
-
-.titulo-obra {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #2C2C2C;
-}
-
-.detalles-obra {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.texto-curatorial {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #666;
-    font-style: italic;
-}
-
-/* CONTROLES */
-.controles-inicio {
+.sculpture-info {
+    padding: var(--spacing-md);
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
 }
 
-.btn-primario, .btn-secundario, .btn-volver, .btn-control {
-    border: none;
-    padding: 16px 24px;
-    font-size: 16px;
-    border-radius: 50px;
-    font-family: 'Inter', sans-serif;
+.sculpture-title {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-primary);
+}
+
+.sculpture-artist {
+    color: var(--color-accent);
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+    margin-bottom: var(--spacing-xs);
+}
+
+.sculpture-details {
+    color: var(--color-dark-gray);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.sculpture-details span {
+    background-color: var(--color-light);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+/* CONTROLES DE AUDIO */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+}
+
+.audio-btn {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 100%;
-}
-
-.btn-primario {
-    background: #2C2C2C;
-    color: white;
-}
-
-.btn-primario:active {
-    background: #1a1a1a;
-    transform: scale(0.98);
-}
-
-.btn-secundario {
-    background: transparent;
-    color: #2C2C2C;
-    border: 2px solid #e0e0e0;
-}
-
-.btn-secundario:active {
-    background: #f8f8f8;
-}
-
-/* FOOTER */
-.pie-inicio {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-    margin-top: auto;
-}
-
-.leyenda {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 6px;
-    font-style: italic;
-}
-
-.creditos {
-    font-size: 12px;
-    color: #aaa;
-}
-
-/* PANTALLA AR */
-#contenedor-ar {
-    background: #000;
-}
-
-.a-scene {
-    width: 100%;
-    height: 100%;
-}
-
-/* OVERLAY AR */
-.ar-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 15px;
-    pointer-events: none;
-}
-
-.ar-overlay > * {
-    pointer-events: auto;
-}
-
-.ar-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 15px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-}
-
-.btn-volver {
-    background: rgba(44, 44, 44, 0.1);
-    color: #2C2C2C;
-    padding: 10px 16px;
-    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition-fast);
     flex-shrink: 0;
 }
 
-.info-obra-ar {
-    flex: 1;
-    min-width: 0;
+.audio-btn:hover {
+    background-color: var(--color-secondary);
+    transform: scale(1.05);
 }
 
-#titulo-obra-ar {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
+.audio-btn.playing {
+    background-color: var(--color-secondary);
+}
+
+.audio-progress {
+    flex-grow: 1;
+    height: 4px;
+    background-color: rgba(139, 115, 85, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.audio-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background-color: var(--color-accent);
+    transition: width 0.1s linear;
+}
+
+.audio-time {
+    font-size: 0.8rem;
+    color: var(--color-dark-gray);
+    min-width: 100px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.audio-transcript {
+    font-size: 0.85rem;
+    color: var(--color-dark-gray);
+    line-height: 1.5;
+    margin-top: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    background-color: rgba(139, 115, 85, 0.05);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--color-accent);
+}
+
+/* BOTONES DE ACCIÓN */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: auto;
+}
+
+.btn {
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-family: var(--font-body);
     font-weight: 500;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#detalles-obra-ar {
-    font-size: 12px;
-    color: #888;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ar-controles {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-    justify-content: center;
-    order: 1;
-}
-
-.btn-control {
-    background: rgba(44, 44, 44, 0.1);
-    color: #2C2C2C;
-    padding: 10px 16px;
-    font-size: 14px;
-    flex: 1;
-}
-
-.btn-control:active {
-    background: rgba(44, 44, 44, 0.2);
-}
-
-.ar-instrucciones {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px;
-    border-radius: 16px;
     text-align: center;
-    max-width: 400px;
-    margin: 0 auto;
-    backdrop-filter: blur(10px);
-}
-
-#texto-instrucciones {
-    font-size: 14px;
-    margin-bottom: 12px;
-    line-height: 1.4;
-}
-
-.indicador-carga {
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: none;
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: var(--spacing-xs);
 }
 
-.punto-carga {
-    width: 6px;
-    height: 6px;
-    background: #C4A35A;
-    border-radius: 50%;
-    opacity: 0.3;
-    animation: pulso 1.5s infinite;
+.btn-ar {
+    background-color: var(--color-accent);
+    color: var(--color-white);
 }
 
-.punto-carga:nth-child(2) { animation-delay: 0.2s; }
-.punto-carga:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes pulso {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
+.btn-ar:hover {
+    background-color: var(--color-secondary);
 }
 
-/* MODAL */
-.modal {
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #1da851;
+}
+
+.btn-disabled {
+    background-color: var(--color-gray);
+    color: var(--color-dark-gray);
+    cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+    background-color: var(--color-gray);
+}
+
+/* MODAL INSTRUCCIONES AR */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: none;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-normal);
 }
 
-.modal[aria-hidden="false"] {
-    display: flex;
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
 }
 
-.modal-contenido {
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    max-width: 500px;
-    width: 100%;
-    max-height: 80vh;
+.modal-content {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
     overflow-y: auto;
-    position: relative;
+    box-shadow: var(--shadow-heavy);
+    transform: translateY(20px);
+    transition: transform var(--transition-normal);
 }
 
-.btn-cerrar-modal {
-    position: absolute;
-    top: 15px;
-    right: 15px;
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray);
+}
+
+.modal-header h3 {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.modal-close {
     background: none;
     border: none;
-    font-size: 24px;
-    color: #666;
-    width: 40px;
-    height: 40px;
+    font-size: 1.8rem;
+    color: var(--color-dark-gray);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: var(--color-primary);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+.instruction-step {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray);
+}
+
+.instruction-step:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.step-number {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
 }
 
-.btn-cerrar-modal:active {
-    background: #f8f8f8;
+.step-content h4 {
+    margin-bottom: var(--spacing-xs);
 }
 
-.modal-titulo {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    margin-bottom: 20px;
-    color: #2C2C2C;
+.step-content p {
+    color: var(--color-dark-gray);
+    font-size: 0.95rem;
+    margin-bottom: 0;
 }
 
-.modal-texto {
-    color: #444;
-    line-height: 1.5;
+.device-compatibility {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
 }
 
-.modal-texto h3 {
-    margin: 20px 0 10px;
-    font-size: 16px;
+.device-compatibility h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
 }
 
-.modal-texto ul {
-    margin-left: 20px;
-    margin-bottom: 20px;
-    color: #666;
+#compatibility-details {
+    font-size: 0.9rem;
 }
 
-.modal-texto li {
-    margin-bottom: 8px;
+/* FOOTER */
+.main-footer {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--spacing-xl) 0 var(--spacing-md);
 }
 
-.contacto {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 }
 
-.contacto h4 {
-    margin-bottom: 10px;
-    font-size: 16px;
+.footer-section h3 {
+    color: var(--color-white);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
-.contacto p {
-    color: #666;
-    margin-bottom: 5px;
+.footer-section p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--spacing-sm);
 }
 
-/* MEDIA QUERIES - RESPONSIVE */
-
-/* Tablets pequeñas (≥ 480px) */
-@media (min-width: 480px) {
-    #inicio {
-        padding: 25px 20px;
-    }
-    
-    .titulo-artista {
-        font-size: 32px;
-    }
-    
-    .imagen-container {
-        height: 220px;
-    }
-    
-    .galeria-imagenes {
-        gap: 20px;
-    }
+.whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: #25D366;
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-fast);
+    margin-top: var(--spacing-sm);
 }
 
-/* Tablets (≥ 600px) */
-@media (min-width: 600px) {
-    .contenido-inicio {
-        max-width: 550px;
-    }
-    
-    .titulo-artista {
-        font-size: 36px;
-    }
-    
-    .galeria-imagenes {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    
-    .imagen-container {
-        flex: 1;
-        min-width: calc(50% - 10px);
-        height: 180px;
-    }
-    
-    .controles-inicio {
-        flex-direction: row;
-    }
-    
-    .btn-primario, .btn-secundario {
-        width: auto;
-        flex: 1;
-    }
-    
-    .ar-header {
-        flex-wrap: nowrap;
-    }
-    
-    .ar-controles {
-        width: auto;
-        order: 0;
-    }
-    
-    .btn-control {
-        flex: 0 0 auto;
-    }
+.whatsapp-btn:hover {
+    background-color: #1da851;
+    transform: translateY(-2px);
 }
 
-/* Tablets grandes (≥ 768px) */
-@media (min-width: 768px) {
-    #inicio {
-        padding: 30px;
-    }
-    
-    .contenido-inicio {
-        max-width: 650px;
-    }
-    
-    .titulo-artista {
-        font-size: 40px;
-    }
-    
-    .subtitulo {
-        font-size: 16px;
-    }
-    
-    .texto-descripcion {
-        font-size: 18px;
-    }
-    
-    .imagen-container {
-        height: 200px;
-    }
-    
-    .instrucciones-titulo {
-        font-size: 18px;
-    }
-    
-    .titulo-obra {
-        font-size: 24px;
-    }
-    
-    .btn-primario, .btn-secundario {
-        padding: 18px 30px;
-        font-size: 17px;
-    }
-    
-    .ar-header {
-        padding: 20px;
-    }
-    
-    #titulo-obra-ar {
-        font-size: 18px;
-    }
+.tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
 }
 
-/* Desktop pequeño (≥ 1024px) */
-@media (min-width: 1024px) {
-    .contenido-inicio {
-        max-width: 700px;
-    }
-    
-    .galeria-imagenes {
-        gap: 25px;
-    }
-    
-    .imagen-container {
-        height: 220px;
-        min-width: calc(33.333% - 17px);
-    }
+.badge {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
 }
 
-/* Orientación horizontal en móviles */
-@media (max-height: 500px) and (orientation: landscape) {
-    #inicio {
-        padding: 15px;
-        overflow-y: auto;
+.footer-bottom {
+    text-align: center;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.footer-bottom a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.footer-bottom a:hover {
+    text-decoration: underline;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+    .hero h2 { font-size: 2.3rem; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; }
+}
+
+@media (max-width: 768px) {
+    .sculptures-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
     
-    .cabecera {
-        margin-bottom: 15px;
+    .hero-features {
+        flex-direction: column;
+        gap: var(--spacing-md);
     }
     
-    .titulo-artista {
-        font-size: 24px;
+    .nav-info {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: flex-start;
     }
     
-    .subtitulo {
-        font-size: 12px;
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
     }
     
-    .galeria-imagenes {
-        flex-direction: row;
-        height: 120px;
-        margin-bottom: 15px;
+    .hero h2 { font-size: 2rem; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.6rem; }
+}
+
+@media (max-width: 576px) {
+    .sculptures-grid {
+        grid-template-columns: 1fr;
     }
     
-    .imagen-container {
-        height: 120px;
+    .container {
+        padding: 0 var(--spacing-sm);
     }
     
-    .instrucciones {
-        padding: 15px;
-        margin-bottom: 15px;
+    .hero {
+        padding: var(--spacing-lg) 0;
     }
     
-    .info-obra-seleccionada {
-        padding: 15px;
-        margin-bottom: 15px;
+    .hero h2 { font-size: 1.8rem; }
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    
+    .sculpture-media {
+        height: 240px;
     }
     
-    .controles-inicio {
-        flex-direction: row;
-        margin-bottom: 15px;
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        width: 95%;
     }
 }
 
-/* iPhone SE y pantallas muy pequeñas */
-@media (max-width: 375px) and (max-height: 667px) {
-    #inicio {
-        padding: 15px;
+/* ANIMACIONES SUAVES */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sculpture-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* ACCESIBILIDAD */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
     
-    .titulo-artista {
-        font-size: 24px;
-    }
-    
-    .texto-descripcion {
-        font-size: 15px;
-    }
-    
-    .imagen-container {
-        height: 150px;
-    }
-    
-    .btn-primario, .btn-secundario {
-        padding: 14px 20px;
-        font-size: 15px;
+    html {
+        scroll-behavior: auto;
     }
 }
 
-/* Ajustes para dispositivos con notch */
-@supports (padding-top: env(safe-area-inset-top)) {
-    #inicio {
-        padding-top: max(20px, env(safe-area-inset-top));
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
-        padding-left: max(15px, env(safe-area-inset-left));
-        padding-right: max(15px, env(safe-area-inset-right));
-    }
-    
-    .ar-overlay {
-        padding-top: max(15px, env(safe-area-inset-top));
-        padding-left: max(15px, env(safe-area-inset-left));
-        padding-right: max(15px, env(safe-area-inset-right));
-    }
+/* Mejora de contraste para accesibilidad */
+.btn:focus,
+.audio-btn:focus,
+.modal-close:focus,
+.ar-instruction-btn:focus {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
 }
 
-/* Prevenir zoom en inputs en iOS */
-input, select, textarea, button {
-    font-size: 16px;
+/* Soporte para modo oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #f0f0f0;
+        --color-secondary: #cccccc;
+        --color-light: #1a1a1a;
+        --color-white: #222222;
+        --color-gray: #333333;
+        --color-dark-gray: #aaaaaa;
+    }
+    
+    .sculpture-card {
+        background-color: #2a2a2a;
+    }
+    
+    .sculpture-title {
+        color: var(--color-primary);
+    }
 }
