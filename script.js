@@ -1,9 +1,7 @@
-// GALERÍA VIRTUAL AR - JavaScript Principal
-// Versión optimizada para carga robusta y compatibilidad máxima
 
-// =============================================
-// CONFIGURACIÓN Y DATOS DE LA GALERÍA
-// =============================================
+
+
+// CONFIGURACIÓN Y DATOS DE LA GALERIA
 
 const galleryData = [
     {
@@ -13,12 +11,24 @@ const galleryData = [
         year: "2023",
         material: "Bronce y mármol",
         description: "Una exploración de las formas naturales y su relación con el espacio tridimensional. La pieza representa la intersección entre lo orgánico y lo geométrico.",
-        modelSrc: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-        audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
+        
+        // MODELO  3D 
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf",
+        poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/Images/duck.png",
+        iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf",
+        
+        //  AUDIO QUE SÍ FUNCIONA SE USA Web Speech API
         audioTranscript: "En esta obra busqué capturar la esencia de las formas que encontramos en la naturaleza, pero reinterpretadas a través de un lenguaje escultórico contemporáneo. El bronce me permite crear superficies fluidas, mientras que el mármol aporta estabilidad y contraste.",
-        arScale: "1 1 1",
+        
+        // CONFIGURACIÓN AR
+        arModes: "scene-viewer webxr quick-look",
+        arScale: "0.5 0.5 0.5",
+        arPlacement: "floor",
         cameraOrbit: "45deg 55deg 2.5m",
-        cameraTarget: "0m 0.5m 0m"
+        cameraTarget: "0m 0.3m 0m",
+        autoRotate: true,
+        shadowIntensity: 1,
+        exposure: 1
     },
     {
         id: 2,
@@ -27,12 +37,22 @@ const galleryData = [
         year: "2022",
         material: "Acero corten y vidrio",
         description: "Una reflexión sobre la fragilidad y la permanencia. La composición desafía las leyes de la gravedad mientras mantiene una armonía visual delicada.",
-        modelSrc: "https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb",
-        audioSrc: "https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3",
+        
+        // MODELO  3D 
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf",
+        poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/Images/box.png",
+        iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf",
+        
         audioTranscript: "Esta pieza surgió de mi fascinación por los momentos de transición. El acero corten, con su pátina natural, representa lo permanente, mientras que el vidrio simboliza la fragilidad. Juntos crean un diálogo entre resistencia y vulnerabilidad.",
-        arScale: "0.8 0.8 0.8",
-        cameraOrbit: "60deg 75deg 2m",
-        cameraTarget: "0m 0.3m 0m"
+        
+        arModes: "scene-viewer webxr quick-look",
+        arScale: "0.3 0.3 0.3",
+        arPlacement: "table",
+        cameraOrbit: "60deg 75deg 1.5m",
+        cameraTarget: "0m 0.2m 0m",
+        autoRotate: true,
+        shadowIntensity: 1.2,
+        exposure: 1.1
     },
     {
         id: 3,
@@ -41,18 +61,26 @@ const galleryData = [
         year: "2023",
         material: "Resina y pigmentos naturales",
         description: "Inspirada en los movimientos fluidos del agua y su capacidad para moldear la tierra. La escultura captura un instante congelado del flujo continuo.",
-        modelSrc: "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb",
-        audioSrc: "https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3",
+        
+        // MODELO  3D 
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf",
+        poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/Images/CesiumMan.png",
+        iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf",
+        
         audioTranscript: "El agua tiene memoria, guarda la historia de todo lo que ha tocado. Con esta obra quise materializar esa idea usando resinas transparentes y pigmentos que recrean las capas sedimentarias. Cada ángulo revela una nueva profundidad.",
-        arScale: "1.2 1.2 1.2",
-        cameraOrbit: "30deg 45deg 3m",
-        cameraTarget: "0m 0.7m 0m"
+        
+        arModes: "scene-viewer webxr quick-look",
+        arScale: "0.4 0.4 0.4",
+        arPlacement: "floor",
+        cameraOrbit: "30deg 45deg 2.5m",
+        cameraTarget: "0m 0.5m 0m",
+        autoRotate: true,
+        shadowIntensity: 0.8,
+        exposure: 0.9
     }
 ];
 
-// =============================================
 // GESTOR DE CARGA DE MODEL VIEWER
-// =============================================
 
 class ModelViewerManager {
     constructor() {
@@ -168,9 +196,8 @@ class ModelViewerManager {
     }
 }
 
-// =============================================
-// DETECCIÓN DE DISPOSITIVO MEJORADA
-// =============================================
+
+// DETECCION DE DISPOSITIVO 
 
 class DeviceDetector {
     constructor() {
@@ -579,9 +606,7 @@ class AudioManager {
     }
 }
 
-// =============================================
-// RENDERIZADOR DE GALERÍA MEJORADO
-// =============================================
+// RENDERIZA LA GALERIA
 
 class GalleryRenderer {
     constructor() {
@@ -636,122 +661,161 @@ class GalleryRenderer {
     }
 
     createSculptureCard(sculpture, deviceInfo) {
-        const card = document.createElement('article');
-        card.className = 'sculpture-card';
-        card.dataset.id = sculpture.id;
-        
-        const modelViewerAvailable = deviceInfo.modelViewerSupported;
-        const arSupported = deviceInfo.arSupported && modelViewerAvailable;
-        
-        // HTML del model-viewer o fallback
-        let modelViewerHTML = '';
-        
-        if (modelViewerAvailable) {
-            modelViewerHTML = `
-                <model-viewer 
-                    id="model-${sculpture.id}"
-                    src="${sculpture.modelSrc}"
-                    alt="${sculpture.title} - ${sculpture.artist}"
-                    ${arSupported ? 'ar ar-modes="webxr scene-viewer quick-look"' : ''}
-                    camera-controls 
-                    touch-action="pan-y"
-                    camera-orbit="${sculpture.cameraOrbit}"
-                    camera-target="${sculpture.cameraTarget}"
-                    auto-rotate 
-                    rotation-per-second="30deg"
-                    shadow-intensity="1"
-                    exposure="1"
-                    environment-image="neutral"
-                    style="width: 100%; height: 100%;">
-                    
-                    <div slot="progress-bar" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f8f8;">
-                        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #8b7355; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="margin-top: 15px; color: #666;">Cargando modelo 3D...</p>
-                    </div>
-                    
-                    ${arSupported ? `
-                    <button slot="ar-button" style="background: #8b7355; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; cursor: pointer; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
-                        <i class="fas fa-cube"></i> Ver en Realidad Aumentada
-                    </button>
-                    ` : ''}
-                    
-                    <div slot="ar-failure" style="text-align: center; padding: 20px; color: #666;">
-                        <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>AR no disponible en este dispositivo</p>
-                    </div>
-                </model-viewer>
-            `;
-        } else {
-            modelViewerHTML = `
-                <div class="model-viewer-fallback">
-                    <div class="fallback-content">
-                        <i class="fas fa-cube" style="font-size: 3rem; color: #8b7355; margin-bottom: 1rem;"></i>
-                        <h4>Vista 3D no disponible</h4>
-                        <p>El visor 3D no se pudo cargar. Esto puede deberse a:</p>
-                        <ul style="text-align: left; margin: 10px 0; font-size: 0.9rem;">
-                            <li>Conexión a Internet lenta</li>
-                            <li>Bloqueo de scripts por el navegador</li>
-                            <li>Falta de soporte para WebGL</li>
-                        </ul>
-                        <button class="retry-load-btn" data-model-id="${sculpture.id}" 
-                                style="background: #8b7355; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px;">
-                            <i class="fas fa-redo"></i> Reintentar carga
-                        </button>
-                    </div>
+    const card = document.createElement('article');
+    card.className = 'sculpture-card';
+    card.dataset.id = sculpture.id;
+    
+    const modelViewerAvailable = deviceInfo.modelViewerSupported;
+    const arSupported = deviceInfo.arSupported && modelViewerAvailable;
+    
+    // CONFIGURACIÓN AR
+    const arConfig = arSupported ? `
+        ar
+        ar-modes="scene-viewer webxr quick-look"
+        ar-scale="${sculpture.arScale || '0.5 0.5 0.5'}"
+        ar-placement="${sculpture.arPlacement || 'floor'}"
+        quick-look-browsers="safari chrome"
+    ` : '';
+    
+    let modelViewerHTML = '';
+    
+    if (modelViewerAvailable) {
+        modelViewerHTML = `
+            <model-viewer 
+                id="model-${sculpture.id}"
+                src="${sculpture.modelSrc}"
+                ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
+                alt="${sculpture.title} - ${sculpture.artist}"
+                ${arConfig}
+                camera-controls 
+                touch-action="pan-y"
+                auto-rotate
+                camera-orbit="${sculpture.cameraOrbit || '45deg 55deg 2.5m'}"
+                camera-target="${sculpture.cameraTarget || '0m 0.3m 0m'}"
+                shadow-intensity="${sculpture.shadowIntensity || 1}"
+                exposure="${sculpture.exposure || 1}"
+                environment-image="neutral"
+                interaction-prompt="none"
+                loading="eager"
+                reveal="auto"
+                style="width: 100%; height: 100%;">
+                
+                <!-- BOTÓN AR PERSONALIZADO -->
+                <button slot="ar-button" 
+                        class="model-ar-button"
+                        style="background: #8b7355; 
+                               color: white; 
+                               border: none; 
+                               padding: 12px 24px; 
+                               border-radius: 25px; 
+                               font-weight: bold; 
+                               cursor: pointer; 
+                               position: absolute; 
+                               bottom: 20px; 
+                               left: 50%; 
+                               transform: translateX(-50%);
+                               z-index: 100;
+                               display: ${arSupported ? 'block' : 'none'};">
+                    <i class="fas fa-cube"></i> Ver en Realidad Aumentada
+                </button>
+                
+                <!-- LOADING - SE OCULTARÁ AUTOMÁTICAMENTE -->
+                <div slot="progress-bar" class="model-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando escultura 3D...</p>
                 </div>
-            `;
-        }
+                
+                <!-- POSTER QUE SE OCULTARÁ CUANDO CARGUE -->
+                ${sculpture.poster ? `
+                <img slot="poster" src="${sculpture.poster}" alt="Vista previa: ${sculpture.title}" 
+                     style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                ` : ''}
+                
+                <!-- ERROR -->
+                <div slot="ar-failure" style="display: none;">
+                    <p>AR no disponible</p>
+                </div>
+            </model-viewer>
+        `;
+    } else {
+        // FALLBACK CON IMAGEN
+        modelViewerHTML = `
+            <div class="model-viewer-fallback">
+                ${sculpture.poster ? `
+                    <img src="${sculpture.poster}" alt="${sculpture.title}" 
+                         style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                ` : `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-cube" style="font-size: 3rem; color: #8b7355; margin-bottom: 1rem;"></i>
+                        <h4>${sculpture.title}</h4>
+                        <p>Vista 3D no disponible</p>
+                    </div>
+                `}
+            </div>
+        `;
+    }
+    
+    card.innerHTML = `
+        <div class="sculpture-media">
+            <div class="model-viewer-container" id="container-${sculpture.id}">
+                ${modelViewerHTML}
+            </div>
+        </div>
         
-        card.innerHTML = `
-            <div class="sculpture-media">
-                <div class="model-viewer-container" id="container-${sculpture.id}">
-                    ${modelViewerHTML}
+        <div class="sculpture-info">
+            <h3 class="sculpture-title">${sculpture.title}</h3>
+            <p class="sculpture-artist">${sculpture.artist}</p>
+            <div class="sculpture-details">
+                <span>${sculpture.year}</span>
+                <span>${sculpture.material}</span>
+            </div>
+            <p class="sculpture-description">${sculpture.description}</p>
+            
+            <div class="audio-controls" id="audio-controls-${sculpture.id}">
+                <button class="audio-btn" id="play-btn-${sculpture.id}">
+                    <i class="fas fa-play"></i>
+                </button>
+                <div class="audio-progress">
+                    <div class="audio-progress-bar" id="progress-bar-${sculpture.id}"></div>
+                </div>
+                <div class="audio-time" id="time-display-${sculpture.id}">0:00 / 0:00</div>
+                
+                <div class="voice-indicator" id="voice-indicator-${sculpture.id}" style="display: none;">
+                    <i class="fas fa-microphone"></i>
+                    <span>Escuchando explicación...</span>
                 </div>
             </div>
             
-            <div class="sculpture-info">
-                <h3 class="sculpture-title">${sculpture.title}</h3>
-                <p class="sculpture-artist">${sculpture.artist}</p>
-                <div class="sculpture-details">
-                    <span>${sculpture.year}</span>
-                    <span>${sculpture.material}</span>
-                </div>
-                <p class="sculpture-description">${sculpture.description}</p>
-                
-                <div class="audio-controls" id="audio-controls-${sculpture.id}">
-                    <button class="audio-btn" id="play-btn-${sculpture.id}">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <div class="audio-progress">
-                        <div class="audio-progress-bar" id="progress-bar-${sculpture.id}"></div>
-                    </div>
-                    <div class="audio-time" id="time-display-${sculpture.id}">0:00 / 0:00</div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn ${arSupported ? 'btn-ar' : 'btn-disabled'}" 
-                            id="ar-btn-${sculpture.id}"
-                            ${!arSupported ? 'disabled' : ''}>
-                        <i class="fas fa-cube"></i> ${arSupported ? 'Ver en Realidad Aumentada' : 'AR no disponible'}
-                    </button>
-                    
-                    <a class="btn btn-whatsapp" 
-                       href="https://wa.me/50612345678?text=Hola%20Daniel,%20estoy%20interesado%20en%20la%20obra%20${encodeURIComponent(sculpture.title)}%20de%20tu%20galería%20virtual.%20¿Podrías%20darme%20más%20información?"
-                       target="_blank">
-                        <i class="fab fa-whatsapp"></i> Consultar para compra
-                    </a>
-                </div>
+            <!-- Transcripción (hidden por defecto) -->
+            <div class="audio-transcript" id="transcript-${sculpture.id}" style="display: none;">
+                <h4><i class="fas fa-comment"></i> Explicación del artista:</h4>
+                <p>"${sculpture.audioTranscript}"</p>
             </div>
-        `;
-        
-        // Configurar eventos
-        setTimeout(() => {
-            this.setupCardEvents(card, sculpture.id, arSupported);
-        }, 100);
-        
-        return card;
-    }
-
+            
+            <div class="action-buttons">
+                <button class="btn ${arSupported ? 'btn-ar' : 'btn-disabled'}" 
+                        id="ar-btn-${sculpture.id}"
+                        ${!arSupported ? 'disabled' : ''}>
+                    <i class="fas fa-cube"></i> ${arSupported ? 'Ver en Realidad Aumentada' : 'AR no disponible'}
+                </button>
+                
+                <a class="btn btn-whatsapp" 
+                   href="https://wa.me/50687922758?text=Hola%20Daniel,%20estoy%20interesado%20en%20la%20obra%20${encodeURIComponent(sculpture.title)}%20de%20tu%20galería%20virtual.%20¿Podrías%20darme%20más%20información?"
+                   target="_blank">
+                    <i class="fab fa-whatsapp"></i> Consultar para compra
+                </a>
+            </div>
+        </div>
+    `;
+    
+    // Configurar eventos DESPUÉS de que el elemento esté en el DOM
+    setTimeout(() => {
+        this.setupCardEvents(card, sculpture.id, arSupported);
+        this.setupModelViewerEvents(sculpture.id); // 👈 NUEVO: eventos del model-viewer
+    }, 100);
+    
+    return card;
+}
     setupCardEvents(card, sculptureId, arSupported) {
         // Audio
         const playBtn = card.querySelector(`#play-btn-${sculptureId}`);
@@ -969,83 +1033,3 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
-
-// =============================================
-// FUNCIONES GLOBALES PARA DEBUG
-// =============================================
-
-// Función para probar Model Viewer manualmente
-window.testModelViewer = function() {
-    console.log('🧪 Probando Model Viewer...');
-    
-    const testDiv = document.createElement('div');
-    testDiv.innerHTML = `
-        <model-viewer 
-            src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-            alt="Test"
-            style="width: 200px; height: 200px;"
-            camera-controls>
-        </model-viewer>
-    `;
-    testDiv.style.position = 'fixed';
-    testDiv.style.bottom = '10px';
-    testDiv.style.right = '10px';
-    testDiv.style.zIndex = '99999';
-    testDiv.style.background = 'white';
-    testDiv.style.padding = '10px';
-    testDiv.style.borderRadius = '5px';
-    testDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
-    
-    document.body.appendChild(testDiv);
-    
-    setTimeout(() => {
-        const mv = testDiv.querySelector('model-viewer');
-        console.log('Test Model Viewer:', mv ? 'CREADO' : 'NO CREADO');
-        if (mv) {
-            console.log('Model Viewer properties:', Object.keys(mv).slice(0, 10));
-        }
-    }, 1000);
-};
-
-// Función para verificar estado
-window.checkGalleryStatus = function() {
-    const status = {
-        deviceInfo: window.deviceInfo,
-        modelViewer: 'modelViewer' in window,
-        webGL: (() => {
-            const canvas = document.createElement('canvas');
-            return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-        })(),
-        https: window.location.protocol === 'https:',
-        userAgent: navigator.userAgent
-    };
-    
-    console.log('📊 Estado de la galería:', status);
-    return status;
-};
-
-// Añadir estilos dinámicos para el spinner
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .model-viewer-fallback {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
-        border-radius: 8px;
-        padding: 20px;
-    }
-    
-    .fallback-content {
-        text-align: center;
-        max-width: 300px;
-    }
-`;
-document.head.appendChild(style);
