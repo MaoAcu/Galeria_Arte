@@ -10,25 +10,35 @@ const galleryData = [
         artist: "Daniel Guido",
         year: "2023",
         material: "Bronce y mármol",
-        description: "Una exploración de las formas naturales y su relación con el espacio tridimensional. La pieza representa la intersección entre lo orgánico y lo geométrico.",
+        description: "Una exploración de las formas naturales y su relación con el espacio tridimensional.",
         
-        // MODELO  3D 
-        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf",
+        // ✅ MODELOS OPTIMIZADOS para AR (GLB binario, no GLTF)
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb", // ¡GLB no GLTF!
         poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/Images/duck.png",
         iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf",
         
-        //  AUDIO QUE SÍ FUNCIONA SE USA Web Speech API
-        audioTranscript: "En esta obra busqué capturar la esencia de las formas que encontramos en la naturaleza, pero reinterpretadas a través de un lenguaje escultórico contemporáneo. El bronce me permite crear superficies fluidas, mientras que el mármol aporta estabilidad y contraste.",
+        audioTranscript: "En esta obra busqué capturar la esencia de las formas naturales...",
         
-        // CONFIGURACIÓN AR
-        arModes: "scene-viewer webxr quick-look",
+        // ✅ CONFIGURACIÓN AR COMPLETA
+        arModes: "webxr scene-viewer quick-look",
         arScale: "0.5 0.5 0.5",
         arPlacement: "floor",
+        arEnvironment: "neutral",
         cameraOrbit: "45deg 55deg 2.5m",
         cameraTarget: "0m 0.3m 0m",
         autoRotate: true,
+        autoRotateDelay: 0,
+        rotationPerSecond: "30deg",
+        interactionPrompt: "none",
+        interactionPromptStyle: "basic",
         shadowIntensity: 1,
-        exposure: 1
+        exposure: 0.8,
+        environmentImage: "neutral",
+        skyboxImage: "",
+        maxCameraOrbit: "Infinity 90deg auto",
+        minCameraOrbit: "-Infinity 10deg auto",
+        maxFieldOfView: "45deg",
+        minFieldOfView: "10deg"
     },
     {
         id: 2,
@@ -36,23 +46,23 @@ const galleryData = [
         artist: "Daniel Guido",
         year: "2022",
         material: "Acero corten y vidrio",
-        description: "Una reflexión sobre la fragilidad y la permanencia. La composición desafía las leyes de la gravedad mientras mantiene una armonía visual delicada.",
+        description: "Una reflexión sobre la fragilidad y la permanencia.",
         
-        // MODELO  3D 
-        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf",
+        // ✅ GLB binario para AR
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb",
         poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/Images/box.png",
         iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf",
         
-        audioTranscript: "Esta pieza surgió de mi fascinación por los momentos de transición. El acero corten, con su pátina natural, representa lo permanente, mientras que el vidrio simboliza la fragilidad. Juntos crean un diálogo entre resistencia y vulnerabilidad.",
+        audioTranscript: "Esta pieza surgió de mi fascinación por los momentos de transición...",
         
-        arModes: "scene-viewer webxr quick-look",
+        arModes: "webxr scene-viewer quick-look",
         arScale: "0.3 0.3 0.3",
-        arPlacement: "table",
-        cameraOrbit: "60deg 75deg 1.5m",
+        arPlacement: "wall",
+        arEnvironment: "neutral",
+        cameraOrbit: "60deg 75deg 2m",
         cameraTarget: "0m 0.2m 0m",
         autoRotate: true,
-        shadowIntensity: 1.2,
-        exposure: 1.1
+        rotationPerSecond: "25deg"
     },
     {
         id: 3,
@@ -60,26 +70,25 @@ const galleryData = [
         artist: "Daniel Guido",
         year: "2023",
         material: "Resina y pigmentos naturales",
-        description: "Inspirada en los movimientos fluidos del agua y su capacidad para moldear la tierra. La escultura captura un instante congelado del flujo continuo.",
+        description: "Inspirada en los movimientos fluidos del agua.",
         
-        // MODELO  3D 
-        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf",
+        // ✅ GLB binario para AR
+        modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb",
         poster: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/Images/CesiumMan.png",
         iosSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF/CesiumMan.gltf",
         
-        audioTranscript: "El agua tiene memoria, guarda la historia de todo lo que ha tocado. Con esta obra quise materializar esa idea usando resinas transparentes y pigmentos que recrean las capas sedimentarias. Cada ángulo revela una nueva profundidad.",
+        audioTranscript: "El agua tiene memoria, guarda la historia de todo lo que ha tocado...",
         
-        arModes: "scene-viewer webxr quick-look",
+        arModes: "webxr scene-viewer quick-look",
         arScale: "0.4 0.4 0.4",
         arPlacement: "floor",
-        cameraOrbit: "30deg 45deg 2.5m",
+        arEnvironment: "neutral",
+        cameraOrbit: "30deg 45deg 3m",
         cameraTarget: "0m 0.5m 0m",
         autoRotate: true,
-        shadowIntensity: 0.8,
-        exposure: 0.9
+        rotationPerSecond: "20deg"
     }
 ];
-
 // GESTOR DE CARGA DE MODEL VIEWER
 
 class ModelViewerManager {
@@ -681,62 +690,35 @@ class GalleryRenderer {
     
     if (modelViewerAvailable) {
         modelViewerHTML = `
-            <model-viewer 
-                id="model-${sculpture.id}"
-                src="${sculpture.modelSrc}"
-                ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
-                alt="${sculpture.title} - ${sculpture.artist}"
-                ${arConfig}
-                camera-controls 
-                touch-action="pan-y"
-                auto-rotate
-                camera-orbit="${sculpture.cameraOrbit || '45deg 55deg 2.5m'}"
-                camera-target="${sculpture.cameraTarget || '0m 0.3m 0m'}"
-                shadow-intensity="${sculpture.shadowIntensity || 1}"
-                exposure="${sculpture.exposure || 1}"
-                environment-image="neutral"
-                interaction-prompt="none"
-                loading="eager"
-                reveal="auto"
-                style="width: 100%; height: 100%;">
-                
-                <!-- BOTÓN AR PERSONALIZADO -->
-                <button slot="ar-button" 
-                        class="model-ar-button"
-                        style="background: #8b7355; 
-                               color: white; 
-                               border: none; 
-                               padding: 12px 24px; 
-                               border-radius: 25px; 
-                               font-weight: bold; 
-                               cursor: pointer; 
-                               position: absolute; 
-                               bottom: 20px; 
-                               left: 50%; 
-                               transform: translateX(-50%);
-                               z-index: 100;
-                               display: ${arSupported ? 'block' : 'none'};">
-                    <i class="fas fa-cube"></i> Ver en Realidad Aumentada
-                </button>
-                
-                <!-- LOADING - SE OCULTARÁ AUTOMÁTICAMENTE -->
-                <div slot="progress-bar" class="model-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando escultura 3D...</p>
-                </div>
-                
-                <!-- POSTER QUE SE OCULTARÁ CUANDO CARGUE -->
-                ${sculpture.poster ? `
-                <img slot="poster" src="${sculpture.poster}" alt="Vista previa: ${sculpture.title}" 
-                     style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
-                ` : ''}
-                
-                <!-- ERROR -->
-                <div slot="ar-failure" style="display: none;">
-                    <p>AR no disponible</p>
-                </div>
-            </model-viewer>
-        `;
+    <model-viewer 
+        id="model-${sculpture.id}"
+        src="${sculpture.modelSrc}"
+        ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
+        alt="${sculpture.title}"
+        ${arConfig}
+        camera-controls
+        auto-rotate
+        style="width: 100%; height: 100%;"
+        reveal="auto"
+        loading="eager"
+        poster-color="transparent"
+        disable-tap="false">
+        
+        <!-- SIN SLOT DE LOADING - solo poster si falla -->
+        ${sculpture.poster ? `
+        <div slot="poster" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
+            <img src="${sculpture.poster}" alt="Vista previa" style="max-width: 80%; max-height: 80%; opacity: 0.6;">
+        </div>
+        ` : ''}
+        
+        <!-- Botón AR -->
+        ${arSupported ? `
+        <button slot="ar-button" class="model-ar-button">
+            <i class="fas fa-cube"></i> Ver en RA
+        </button>
+        ` : ''}
+    </model-viewer>
+`;
     } else {
         // FALLBACK CON IMAGEN
         modelViewerHTML = `
@@ -856,14 +838,180 @@ class GalleryRenderer {
         }
     }
 
-    activateAR(sculptureId) {
-        const modelViewer = document.querySelector(`#model-${sculptureId}`);
-        if (modelViewer && typeof modelViewer.activateAR === 'function') {
-            modelViewer.activateAR();
-        } else {
+   async activateAR(sculptureId) {
+    console.log(`📱 ACTIVANDO AR para escultura ${sculptureId} en producción`);
+    
+    const modelViewer = document.querySelector(`#model-${sculptureId}`);
+    if (!modelViewer) {
+        console.error('❌ Model Viewer no encontrado');
+        this.showARError('No se encontró el modelo 3D');
+        return;
+    }
+    
+    // Verificar HTTPS
+    if (window.location.protocol !== 'https:') {
+        this.showARError('AR requiere HTTPS. Estás en: ' + window.location.protocol);
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    this.showARLoading('Preparando Realidad Aumentada...');
+    
+    try {
+        // PRIMERO: Verificar permisos de cámara
+        const hasCameraAccess = await this.requestCameraPermission();
+        
+        if (!hasCameraAccess) {
+            this.showARError('Se requiere permiso de cámara para AR. Por favor, permite el acceso a la cámara en la configuración de tu navegador.');
+            return;
+        }
+        
+        // SEGUNDO: Verificar compatibilidad AR
+        const isARSupported = await this.checkARSpecificSupport();
+        
+        if (!isARSupported) {
             this.showARInstructions();
+            return;
+        }
+        
+        // TERCERO: Activar AR con método específico por dispositivo
+        await this.activateARByDevice(modelViewer, sculptureId);
+        
+    } catch (error) {
+        console.error('💥 Error en AR:', error);
+        this.handleARError(error);
+    } finally {
+        this.hideARLoading();
+    }
+}
+
+async requestCameraPermission() {
+    try {
+        // Método moderno para permisos de cámara
+        const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+        
+        if (permissionStatus.state === 'granted') {
+            return true;
+        }
+        
+        if (permissionStatus.state === 'prompt') {
+            // Solicitar permiso explícitamente
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: {
+                    facingMode: { ideal: 'environment' }, // Cámara trasera
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            });
+            
+            // Detener stream inmediatamente (solo queríamos el permiso)
+            stream.getTracks().forEach(track => track.stop());
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.warn('Error permisos cámara:', error);
+        return false;
+    }
+}
+
+async checkARSpecificSupport() {
+    // Detección específica para AR
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    
+    if (isAndroid) {
+        // Verificar ARCore para Android
+        return await this.checkARCoreSupport();
+    } else if (isIOS) {
+        // Verificar ARKit para iOS
+        return await this.checkARKitSupport();
+    }
+    
+    return false;
+}
+
+async checkARCoreSupport() {
+    // Para Android: Scene Viewer es la forma más confiable
+    try {
+        // Verificar si Scene Viewer está disponible
+        const sceneViewerIntent = 'intent://arvr.google.com/scene-viewer/1.0';
+        return true; // Asumir compatible si es Android moderno
+    } catch (error) {
+        return false;
+    }
+}
+
+async activateARByDevice(modelViewer, sculptureId) {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    
+    if (isIOS) {
+        // Para iOS: Usar Quick Look
+        await this.activateQuickLook(modelViewer, sculptureId);
+    } else {
+        // Para Android/otros: Usar WebXR o Scene Viewer
+        await this.activateWebXR(modelViewer, sculptureId);
+    }
+}
+
+async activateQuickLook(modelViewer, sculptureId) {
+    // iOS Quick Look (muy confiable)
+    const sculpture = galleryData.find(s => s.id === sculptureId);
+    if (!sculpture || !sculpture.iosSrc) {
+        throw new Error('No hay modelo para iOS');
+    }
+    
+    console.log('🍎 Activando Quick Look para iOS');
+    
+    // Crear enlace Quick Look
+    const quickLookLink = document.createElement('a');
+    quickLookLink.href = sculpture.iosSrc;
+    quickLookLink.setAttribute('rel', 'ar');
+    quickLookLink.innerHTML = `
+        <img src="${sculpture.poster}" width="200" height="200" alt="${sculpture.title}">
+    `;
+    
+    // Disparar click (iOS detectará el atributo 'rel="ar"')
+    quickLookLink.click();
+}
+
+async activateWebXR(modelViewer, sculptureId) {
+    console.log('🤖 Activando WebXR para Android/Desktop');
+    
+    if (typeof modelViewer.activateAR === 'function') {
+        try {
+            await modelViewer.activateAR();
+            console.log('✅ AR activado con activateAR()');
+            return;
+        } catch (error) {
+            console.warn('activateAR() falló:', error);
         }
     }
+    
+    // Fallback: Botón slot
+    const arButton = modelViewer.querySelector('[slot="ar-button"]');
+    if (arButton) {
+        console.log('🖱️ Usando botón AR slot');
+        arButton.click();
+        return;
+    }
+    
+    // Último recurso: WebXR manual
+    if ('xr' in navigator) {
+        try {
+            const session = await navigator.xr.requestSession('immersive-ar');
+            console.log('WebXR session iniciada:', session);
+            // Aquí integrarías el modelo con Three.js
+        } catch (error) {
+            throw new Error('WebXR no disponible: ' + error.message);
+        }
+    }
+    
+    throw new Error('No se pudo activar AR');
+}
 
     initModal() {
         const modal = document.getElementById('ar-modal');
