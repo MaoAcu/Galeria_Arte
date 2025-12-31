@@ -615,6 +615,7 @@ class AudioManager {
     }
 }
 
+
 // RENDERIZA LA GALERIA
 
 class GalleryRenderer {
@@ -689,36 +690,64 @@ class GalleryRenderer {
     let modelViewerHTML = '';
     
     if (modelViewerAvailable) {
-        modelViewerHTML = `
-    <model-viewer 
-        id="model-${sculpture.id}"
-        src="${sculpture.modelSrc}"
-        ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
-        alt="${sculpture.title}"
-        ${arConfig}
-        camera-controls
-        auto-rotate
-        style="width: 100%; height: 100%;"
-        reveal="auto"
-        loading="eager"
-        poster-color="transparent"
-        disable-tap="false">
-        
-        <!-- SIN SLOT DE LOADING - solo poster si falla -->
-        ${sculpture.poster ? `
-        <div slot="poster" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
-            <img src="${sculpture.poster}" alt="Vista previa" style="max-width: 80%; max-height: 80%; opacity: 0.6;">
-        </div>
-        ` : ''}
-        
-        <!-- Botón AR -->
-        ${arSupported ? `
-        <button slot="ar-button" class="model-ar-button">
-            <i class="fas fa-cube"></i> Ver en RA
-        </button>
-        ` : ''}
-    </model-viewer>
-`;
+        if (modelViewerAvailable) {
+    modelViewerHTML = `
+        <model-viewer 
+            id="model-${sculpture.id}"
+            src="${sculpture.modelSrc}"
+            ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
+            alt="${sculpture.title}"
+            ${arConfig}
+            camera-controls
+            auto-rotate
+            style="width: 100%; height: 100%;"
+            reveal="auto"
+            loading="eager"
+            poster-color="transparent"
+            disable-tap="false"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            ar-scale="0.5 0.5 0.5"
+            ar-placement="floor"
+            interaction-prompt="none">
+            
+            <!-- SIN SLOT DE LOADING - solo poster si falla -->
+            ${sculpture.poster ? `
+            <div slot="poster" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
+                <img src="${sculpture.poster}" alt="Vista previa" style="max-width: 80%; max-height: 80%; opacity: 0.6;">
+            </div>
+            ` : ''}
+            
+            <!-- Botón AR FUNCIONAL -->
+            ${arSupported ? `
+            <button slot="ar-button" 
+                    class="model-ar-button"
+                    style="background: linear-gradient(135deg, #8b7355 0%, #6b5a45 100%); 
+                           color: white; 
+                           border: none; 
+                           padding: 14px 28px; 
+                           border-radius: 30px; 
+                           font-weight: 600; 
+                           font-size: 1rem; 
+                           cursor: pointer; 
+                           position: absolute; 
+                           bottom: 25px; 
+                           left: 50%; 
+                           transform: translateX(-50%);
+                           z-index: 1000; 
+                           box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3); 
+                           transition: all 0.3s ease; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center; 
+                           gap: 8px; 
+                           min-width: 220px;">
+                <i class="fas fa-cube"></i> Ver en Realidad Aumentada
+            </button>
+            ` : ''}
+        </model-viewer>
+    `;
+}
     } else {
         // FALLBACK CON IMAGEN
         modelViewerHTML = `
@@ -791,11 +820,17 @@ class GalleryRenderer {
     `;
     
     // Configurar eventos DESPUÉS de que el elemento esté en el DOM
-    setTimeout(() => {
-        this.setupCardEvents(card, sculpture.id, arSupported);
-        this.setupModelViewerEvents(sculpture.id); // 👈 NUEVO: eventos del model-viewer
-    }, 100);
+    const self = this;
+    const currentId = sculpture.id;
     
+    setTimeout(() => {
+        try {
+            self.setupCardEvents(card, currentId, arSupported);
+            self.setupModelViewerEvents(currentId);
+        } catch (error) {
+            console.error(`Error en setup para escultura ${currentId}:`, error);
+        }
+    }, 100);
     return card;
 }
     setupCardEvents(card, sculptureId, arSupported) {
@@ -884,38 +919,89 @@ class GalleryRenderer {
         this.hideARLoading();
     }
 }
-
-async requestCameraPermission() {
+setupModelViewerEvents(sculptureId) {
     try {
-        // Método moderno para permisos de cámara
-        const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+        console.log(`🔄 Configurando eventos AR para modelo ${sculptureId}`);
         
-        if (permissionStatus.state === 'granted') {
-            return true;
-        }
+        const modelViewer = document.querySelector(`#model-${sculptureId}`);
+        if (!modelViewer) return;
         
-        if (permissionStatus.state === 'prompt') {
-            // Solicitar permiso explícitamente
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: {
-                    facingMode: { ideal: 'environment' }, // Cámara trasera
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
-            });
+        // Esperar a que model-viewer esté completamente inicializado
+        setTimeout(() => {
+            // Configurar el botón AR personalizado
+            const arButton = modelViewer.querySelector('[slot="ar-button"]');
+            if (arButton) {
+                // Añadir funcionalidad extra al botón
+                arButton.addEventListener('click', async (e) => {
+                    e.stopPropagation(); // Evitar múltiples clics
+                    
+                    console.log(`🎯 Botón AR presionado para modelo ${sculptureId}`);
+                    
+                    // Verificar permisos de cámara primero
+                    const hasPermission = await this.checkCameraPermission();
+                    
+                    if (!hasPermission) {
+                        this.showCameraPermissionModal(sculptureId);
+                        return;
+                    }
+                    
+                    // Activar AR
+                    try {
+                        if (typeof modelViewer.activateAR === 'function') {
+                            await modelViewer.activateAR();
+                            console.log('✅ AR activado correctamente');
+                        } else {
+                            console.warn('activateAR() no disponible');
+                            // El botón slot ya debería funcionar por sí solo
+                        }
+                    } catch (error) {
+                        console.error('Error activando AR:', error);
+                        this.showARErrorModal(sculptureId, error);
+                    }
+                });
+            }
             
-            // Detener stream inmediatamente (solo queríamos el permiso)
-            stream.getTracks().forEach(track => track.stop());
-            return true;
-        }
+            // También configurar el botón AR principal de la card
+            const mainArButton = document.getElementById(`ar-btn-${sculptureId}`);
+            if (mainArButton && !mainArButton.disabled) {
+                mainArButton.addEventListener('click', async () => {
+                    await this.activateARWithPermission(sculptureId);
+                });
+            }
+            
+        }, 500); // Dar tiempo a que model-viewer se inicialice
         
-        return false;
     } catch (error) {
-        console.warn('Error permisos cámara:', error);
-        return false;
+        console.error(`Error configurando eventos AR para ${sculptureId}:`, error);
     }
 }
-
+async requestCameraAndActivateAR(sculptureId) {
+    try {
+        // Solicitar permiso explícito
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: { ideal: 'environment' },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        });
+        
+        // Detener stream (ya tenemos permiso)
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Ocultar modal
+        this.hidePermissionModal();
+        
+        // Activar AR
+        setTimeout(() => {
+            this.activateARWithPermission(sculptureId);
+        }, 300);
+        
+    } catch (error) {
+        console.error('Error obteniendo permiso de cámara:', error);
+        alert('No se pudo acceder a la cámara. Por favor, verifica los permisos en la configuración de tu navegador.');
+    }
+}
 async checkARSpecificSupport() {
     // Detección específica para AR
     const userAgent = navigator.userAgent.toLowerCase();

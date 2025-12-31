@@ -25,10 +25,9 @@
     <meta property="og:url" content="https://galeria-ar.com">
     <meta property="og:image" content="https://galeria-ar.com/preview.jpg">
     
-  <script type="module">
+   <script type="module">
     // Configuración OPTIMIZADA para AR en producción
-    console.log('🚀 Configurando Model Viewer para producción...');
-    
+  
     // Precargar recursos AR
     const preloadLink = document.createElement('link');
     preloadLink.rel = 'preload';
@@ -37,42 +36,9 @@
     preloadLink.crossOrigin = 'anonymous';
     document.head.appendChild(preloadLink);
     
-    // Cargar Model Viewer con configuración AR optimizada
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.2.0/dist/model-viewer.min.js';
-    
-    script.onload = () => {
-        console.log('✅ Model Viewer 3.2.0 cargado (optimizado para AR)');
-        
-        // Configurar globalmente para AR
-        if (window.ModelViewerElement) {
-            window.ModelViewerElement.arConfig = {
-                'ar': true,
-                'ar-modes': 'webxr scene-viewer quick-look',
-                'ar-scale': 'auto',
-                'ar-placement': 'floor',
-                'ar-tracking': 'position',
-                'touch-action': 'pan-y',
-                'disable-zoom': false,
-                'interaction-prompt': 'none'
-            };
-        }
-        
-        window.dispatchEvent(new Event('model-viewer-ready'));
-    };
-    
-    script.onerror = () => {
-        console.warn('⚠️ Falló CDN principal, usando alternativa...');
-        const fallback = document.createElement('script');
-        fallback.type = 'module';
-        fallback.src = 'https://unpkg.com/@google/model-viewer@3.2.0/dist/model-viewer.min.js';
-        fallback.onload = () => window.dispatchEvent(new Event('model-viewer-ready'));
-        document.head.appendChild(fallback);
-    };
     
     document.head.appendChild(script);
-</script>
+</script> 
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,8 +49,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="styles.css">
-    
+
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- Preloads -->
     <link rel="preload" href="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js" as="script" crossorigin>
     <link rel="modulepreload" href="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
@@ -214,7 +180,7 @@
                     <h3>Contacto Artista</h3>
                     <p><strong>Daniel Guido</strong></p>
                     <p>Escultor contemporáneo especializado en formas orgánicas y materiales mixtos.</p>
-                    <a href="https://wa.me/50612345678?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual" 
+                    <a href="https://wa.me/50687922758?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual" 
                        class="whatsapp-btn" target="_blank">
                         <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
                     </a>
@@ -240,8 +206,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="script.js"></script>
-    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <!-- Script de inicialización mejorado -->
     <script>
         // Estado global de carga
