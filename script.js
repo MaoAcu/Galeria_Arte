@@ -792,12 +792,7 @@ createSculptureCard(sculpture, deviceInfo) {
             </div>
             
             <div class="action-buttons">
-                <!-- Botón externo que activa el AR programáticamente -->
-                <button class="btn ${arSupported ? "btn-ar" : "btn-disabled"}" 
-                        id="ar-btn-${sculpture.id}"
-                        ${!arSupported ? "disabled" : ""}>
-                    <i class="fas fa-cube"></i> ${arSupported ? "Activar Realidad Aumentada" : "AR no disponible"}
-                </button>
+               
                 
                 <a class="btn btn-whatsapp" 
                    href="https://wa.me/50687922758?text=Hola%20Daniel,%20estoy%20interesado%20en%20la%20obra%20${encodeURIComponent(sculpture.title)}%20de%20tu%20galería%20virtual.%20¿Podrías%20darme%20más%20información?"
