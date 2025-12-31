@@ -6,11 +6,11 @@
 const galleryData = [
     {
         id: 1,
-        title: "Formas Orgánicas I",
+        title: "Guardián del Silencio",
         artist: "Daniel Guido",
-        year: "2023",
-        material: "Bronce y mármol",
-        description: "Una exploración de las formas naturales y su relación con el espacio tridimensional.",
+        year: "2025",
+        material: "Madera [especificar tipo]",
+        description: "Escultura tallada directamente en madera maciza que revela un búho resguardado en el interior del tronco que le dio origen.",
         
         // ✅ MODELOS OPTIMIZADOS para AR (GLB binario, no GLTF)
         modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb", // ¡GLB no GLTF!
@@ -42,11 +42,11 @@ const galleryData = [
     },
     {
         id: 2,
-        title: "Equilibrio Inestable",
+        title: "Fuerza Ancestral",
         artist: "Daniel Guido",
-        year: "2022",
-        material: "Acero corten y vidrio",
-        description: "Una reflexión sobre la fragilidad y la permanencia.",
+        year: "2025",
+        material: "Madera [especificar tipo]",
+        description: "Tallado expresivo en madera que representa la cabeza de un bovino como símbolo de trabajo, resistencia y vínculo entre el ser humano y la tierra.",
         
         // ✅ GLB binario para AR
         modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb",
@@ -66,11 +66,11 @@ const galleryData = [
     },
     {
         id: 3,
-        title: "Memoria del Agua",
+        title: "Raíz de Identidad",
         artist: "Daniel Guido",
-        year: "2023",
-        material: "Resina y pigmentos naturales",
-        description: "Inspirada en los movimientos fluidos del agua.",
+        year: "2025",
+        material: "Madera [especificar tipo]",
+        description: "Escultura figurativa en madera que retrata un busto femenino cuya cabellera se transforma en una extensión abstracta y texturizada, semejante a raíces.",
         
         // ✅ GLB binario para AR
         modelSrc: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb",
