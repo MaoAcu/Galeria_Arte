@@ -670,103 +670,97 @@ class GalleryRenderer {
         });
     }
 
-    createSculptureCard(sculpture, deviceInfo) {
-    const card = document.createElement('article');
-    card.className = 'sculpture-card';
-    card.dataset.id = sculpture.id;
-    
-    const modelViewerAvailable = deviceInfo.modelViewerSupported;
-    const arSupported = deviceInfo.arSupported && modelViewerAvailable;
-    
-    // CONFIGURACIÓN AR
-    const arConfig = arSupported ? `
-        ar
-        ar-modes="scene-viewer webxr quick-look"
-        ar-scale="${sculpture.arScale || '0.5 0.5 0.5'}"
-        ar-placement="${sculpture.arPlacement || 'floor'}"
-        quick-look-browsers="safari chrome"
-    ` : '';
-    
-    let modelViewerHTML = '';
-    
-    if (modelViewerAvailable) {
-        if (modelViewerAvailable) {
+createSculptureCard(sculpture, deviceInfo) {
+  const card = document.createElement("article")
+  card.className = "sculpture-card"
+  card.dataset.id = sculpture.id
+
+  const modelViewerAvailable = deviceInfo.modelViewerSupported
+  const arSupported = deviceInfo.arSupported && modelViewerAvailable
+
+  let modelViewerHTML = ""
+
+  if (modelViewerAvailable) {
     modelViewerHTML = `
-        <model-viewer 
-            id="model-${sculpture.id}"
-            src="${sculpture.modelSrc}"
-            ${sculpture.poster ? `poster="${sculpture.poster}"` : ''}
-            alt="${sculpture.title}"
-            ${arConfig}
-            camera-controls
-            auto-rotate
-            style="width: 100%; height: 100%;"
-            reveal="auto"
-            loading="eager"
-            poster-color="transparent"
-            disable-tap="false"
-            ar
-            ar-modes="webxr scene-viewer quick-look"
-            ar-scale="0.5 0.5 0.5"
-            ar-placement="floor"
-            interaction-prompt="none">
-            
-            <!-- SIN SLOT DE LOADING - solo poster si falla -->
-            ${sculpture.poster ? `
-            <div slot="poster" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
-                <img src="${sculpture.poster}" alt="Vista previa" style="max-width: 80%; max-height: 80%; opacity: 0.6;">
-            </div>
-            ` : ''}
-            
-            <!-- Botón AR FUNCIONAL -->
-            ${arSupported ? `
-            <button slot="ar-button" 
-                    class="model-ar-button"
-                    style="background: linear-gradient(135deg, #8b7355 0%, #6b5a45 100%); 
-                           color: white; 
-                           border: none; 
-                           padding: 14px 28px; 
-                           border-radius: 30px; 
-                           font-weight: 600; 
-                           font-size: 1rem; 
-                           cursor: pointer; 
-                           position: absolute; 
-                           bottom: 25px; 
-                           left: 50%; 
-                           transform: translateX(-50%);
-                           z-index: 1000; 
-                           box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3); 
-                           transition: all 0.3s ease; 
-                           display: flex; 
-                           align-items: center; 
-                           justify-content: center; 
-                           gap: 8px; 
-                           min-width: 220px;">
-                <i class="fas fa-cube"></i> Ver en Realidad Aumentada
-            </button>
-            ` : ''}
-        </model-viewer>
-    `;
-}
-    } else {
-        // FALLBACK CON IMAGEN
-        modelViewerHTML = `
+            <model-viewer 
+                id="model-${sculpture.id}"
+                src="${sculpture.modelSrc}"
+                ${sculpture.poster ? `poster="${sculpture.poster}"` : ""}
+                alt="${sculpture.title}"
+                camera-controls
+                auto-rotate
+                ${arSupported ? 'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor"' : ""}
+                style="width: 100%; height: 100%;"
+                loading="eager"
+                reveal="auto"
+                interaction-prompt="none">
+                
+                ${
+                  sculpture.poster
+                    ? `
+                <div slot="poster" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f8f8; display: flex; align-items: center; justify-content: center;">
+                    <img src="${sculpture.poster}" alt="Vista previa" style="max-width: 80%; max-height: 80%; opacity: 0.6;">
+                </div>
+                `
+                    : ""
+                }
+                
+                <!-- Botón AR dentro del model-viewer (manejado automáticamente) -->
+                ${
+                  arSupported
+                    ? `
+                <button slot="ar-button" 
+                        id="ar-slot-btn-${sculpture.id}"
+                        class="model-ar-button"
+                        style="background: linear-gradient(135deg, #8b7355 0%, #6b5a45 100%); 
+                               color: white; 
+                               border: none; 
+                               padding: 14px 28px; 
+                               border-radius: 30px; 
+                               font-weight: 600; 
+                               font-size: 1rem; 
+                               cursor: pointer; 
+                               position: absolute; 
+                               bottom: 25px; 
+                               left: 50%; 
+                               transform: translateX(-50%);
+                               z-index: 1000; 
+                               box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3); 
+                               transition: all 0.3s ease; 
+                               display: flex; 
+                               align-items: center; 
+                               justify-content: center; 
+                               gap: 8px; 
+                               min-width: 220px;">
+                    <i class="fas fa-cube"></i> Ver en tu espacio
+                </button>
+                `
+                    : ""
+                }
+            </model-viewer>
+        `
+  } else {
+    modelViewerHTML = `
             <div class="model-viewer-fallback">
-                ${sculpture.poster ? `
+                ${
+                  sculpture.poster
+                    ? `
                     <img src="${sculpture.poster}" alt="${sculpture.title}" 
                          style="max-width: 90%; max-height: 90%; object-fit: contain;">
-                ` : `
+                `
+                    : `
                     <div style="text-align: center; padding: 20px;">
                         <i class="fas fa-cube" style="font-size: 3rem; color: #8b7355; margin-bottom: 1rem;"></i>
                         <h4>${sculpture.title}</h4>
                         <p>Vista 3D no disponible</p>
                     </div>
-                `}
+                `
+                }
             </div>
-        `;
-    }
-    
-    card.innerHTML = `
+        `
+  }
+
+  card.innerHTML = `
         <div class="sculpture-media">
             <div class="model-viewer-container" id="container-${sculpture.id}">
                 ${modelViewerHTML}
@@ -790,24 +784,19 @@ class GalleryRenderer {
                     <div class="audio-progress-bar" id="progress-bar-${sculpture.id}"></div>
                 </div>
                 <div class="audio-time" id="time-display-${sculpture.id}">0:00 / 0:00</div>
-                
-                <div class="voice-indicator" id="voice-indicator-${sculpture.id}" style="display: none;">
-                    <i class="fas fa-microphone"></i>
-                    <span>Escuchando explicación...</span>
-                </div>
             </div>
             
-            <!-- Transcripción (hidden por defecto) -->
             <div class="audio-transcript" id="transcript-${sculpture.id}" style="display: none;">
                 <h4><i class="fas fa-comment"></i> Explicación del artista:</h4>
                 <p>"${sculpture.audioTranscript}"</p>
             </div>
             
             <div class="action-buttons">
-                <button class="btn ${arSupported ? 'btn-ar' : 'btn-disabled'}" 
+                <!-- Botón externo que activa el AR programáticamente -->
+                <button class="btn ${arSupported ? "btn-ar" : "btn-disabled"}" 
                         id="ar-btn-${sculpture.id}"
-                        ${!arSupported ? 'disabled' : ''}>
-                    <i class="fas fa-cube"></i> ${arSupported ? 'Ver en Realidad Aumentada' : 'AR no disponible'}
+                        ${!arSupported ? "disabled" : ""}>
+                    <i class="fas fa-cube"></i> ${arSupported ? "Activar Realidad Aumentada" : "AR no disponible"}
                 </button>
                 
                 <a class="btn btn-whatsapp" 
@@ -817,23 +806,52 @@ class GalleryRenderer {
                 </a>
             </div>
         </div>
-    `;
-    
-    // Configurar eventos DESPUÉS de que el elemento esté en el DOM
-    const self = this;
-    const currentId = sculpture.id;
-    
-    setTimeout(() => {
-        try {
-            self.setupCardEvents(card, currentId, arSupported);
-            self.setupModelViewerEvents(currentId);
-        } catch (error) {
-            console.error(`Error en setup para escultura ${currentId}:`, error);
-        }
-    }, 100);
-    return card;
+    `
+
+  setTimeout(() => {
+    setupARButton(sculpture.id, arSupported)
+    setupAudioControls(sculpture)
+  }, 100)
+
+  return card
 }
-    setupCardEvents(card, sculptureId, arSupported) {
+
+ setupARButton(sculptureId, arSupported) {
+  if (!arSupported) return
+
+  const externalBtn = document.getElementById(`ar-btn-${sculptureId}`)
+  const modelViewer = document.getElementById(`model-${sculptureId}`)
+
+  if (externalBtn && modelViewer) {
+    externalBtn.addEventListener("click", () => {
+      console.log("[v0] Activando AR para modelo:", sculptureId)
+
+      // Activar AR del model-viewer programáticamente
+      if (modelViewer.canActivateAR) {
+        modelViewer.activateAR()
+      } else {
+        console.error("[v0] AR no disponible en este modelo")
+        alert("AR no disponible. Asegúrate de estar en un dispositivo compatible.")
+      }
+    })
+
+    // Debug: verificar capacidades AR
+    modelViewer.addEventListener("load", () => {
+      console.log("[v0] Model-viewer cargado. AR disponible:", modelViewer.canActivateAR)
+    })
+  }
+}
+
+ setupAudioControls(sculpture) {
+  const playBtn = document.getElementById(`play-btn-${sculpture.id}`)
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      console.log("[v0] Reproducir audio para:", sculpture.title)
+      // Implementar lógica de audio aquí
+    })
+  }
+}
+   setupCardEvents(card, sculptureId, arSupported) {
         // Audio
         const playBtn = card.querySelector(`#play-btn-${sculptureId}`);
         if (playBtn) {

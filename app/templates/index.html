@@ -8,37 +8,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#8b7355">
 
-    <!--Politicas de permisos -->
-    <meta http-equiv="Permissions-Policy" content="camera=*, microphone=()">
-    <meta http-equiv="Feature-Policy" content="camera *">
+    <!-- Políticas de permisos corregidas para cámara -->
+    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=()">
     
-    <!-- SEO DE LA PAGINA -->
     <title>Galería Virtual AR | Esculturas Contemporáneas de Daniel Guido</title>
     <meta name="description" content="Galería virtual innovadora con Realidad Aumentada. Explora esculturas contemporáneas de Daniel Guido en 3D interactivo y RA.">
-    <meta name="keywords" content="esculturas, realidad aumentada, arte contemporáneo, Daniel Guido, galería virtual, WebAR, arte 3D">
-    <meta name="author" content="Galería Virtual AR">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Galería Virtual AR | Experiencia Inmersiva">
-    <meta property="og:description" content="Explora esculturas en Realidad Aumentada desde tu dispositivo">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://galeria-ar.com">
-    <meta property="og:image" content="https://galeria-ar.com/preview.jpg">
-    
-   <script type="module">
-    // Configuración OPTIMIZADA para AR en producción
-  
-    // Precargar recursos AR
-    const preloadLink = document.createElement('link');
-    preloadLink.rel = 'preload';
-    preloadLink.href = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.2.0/dist/model-viewer.min.js';
-    preloadLink.as = 'script';
-    preloadLink.crossOrigin = 'anonymous';
-    document.head.appendChild(preloadLink);
-    
-    
-    document.head.appendChild(script);
-</script> 
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,13 +23,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CSS -->
-
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Preloads -->
-    <link rel="preload" href="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js" as="script" crossorigin>
-    <link rel="modulepreload" href="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     
-    
+    <!-- Model Viewer cargado correctamente -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </head>
 <body>
     <!-- Loader Global -->
