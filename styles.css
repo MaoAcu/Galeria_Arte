@@ -1021,7 +1021,7 @@ button {
     border: 0;
 }
 /* ============================================= */
-/* HEADER GALLERY - ICONOS EN MÓVILES, TEXTO EN DESKTOP */
+/* HEADER GALLERY 
 /* ============================================= */
 
 .gallery-header {
@@ -1051,8 +1051,8 @@ button {
     width: 100%;
 }
 
-/* IMPORTANTE: RESTAURAR EL COMPORTAMIENTO ORIGINAL */
-/* En móviles (< 640px): ocultar texto, en desktop: mostrar */
+ 
+ 
 .btn-outline .hidden.sm\:inline,
 .btn-primary .hidden.sm\:inline {
     display: none; /* Oculta en móviles por defecto */
