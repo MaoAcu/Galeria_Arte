@@ -227,6 +227,7 @@ body {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: var(--spacing-md);
+    margin-left: 30px;  
 }
 
 @keyframes spin {
@@ -858,33 +859,62 @@ button {
 }
 
 /* Botón cerrar */
-.lightbox-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s ease;
+#lightbox-close,
+button.lightbox-close {
+    all: unset !important; /* Reset de todos los estilos heredados */
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: none !important;
+    color: white !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+    transition: all 0.2s ease !important;
+    pointer-events: auto !important;
 }
 
-.lightbox-close:hover {
-    background: #8b7355;
-    transform: rotate(90deg);
+#lightbox-close:hover,
+button.lightbox-close:hover {
+    background: #8b7355 !important;
+    transform: rotate(90deg) !important;
 }
 
-.lightbox-close i {
-    font-size: 1.2rem;
+#lightbox-close i,
+button.lightbox-close i {
+    font-size: 1.2rem !important;
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    display: inline-block !important;
+    pointer-events: none !important; /* El click pasa al botón */
 }
 
+/* Remover cualquier interferencia del header */
+.lightbox-overlay .btn-outline,
+.lightbox-overlay .btn-primary,
+#lightbox .btn-outline,
+#lightbox .btn-primary {
+    all: unset !important; /* Reset completo */
+}
+
+/* Asegurar que el área del botón sea clickeable */
+#lightbox-close::before,
+button.lightbox-close::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -10px !important;
+    right: -10px !important;
+    bottom: -10px !important;
+    left: -10px !important;
+    z-index: -1 !important;
+}
 /* Detalles */
 .lightbox-details {
     padding: 2rem;
@@ -1253,6 +1283,15 @@ button {
 .btn-outline i[data-lucide]:has(svg)::before,
 .btn-primary i[data-lucide]:has(svg)::before {
     display: none !important;
+}
+.gallery-header-content button i[data-lucide="arrow-left"]:empty::after {
+    content: "←";
+    display: inline-block;
+}
+
+.gallery-header-content a.btn-primary i[data-lucide="external-link"]:empty::after {
+    content: "↗";
+    display: inline-block;
 }
 /* ============================================= */
 /* MODAL AR */
