@@ -345,7 +345,7 @@ class GalleryLightbox {
         if (description) description.textContent = sculpture.description;
         
         if (whatsapp) {
-            whatsapp.href = `https://wa.me/50687922758?text=Hola%20Daniel,%20estoy%20interesado%20en%20la%20obra%20%22${encodeURIComponent(sculpture.title)}%22`;
+            whatsapp.href = `https://wa.me/50660204266?text=Hola%20Daniel,%20estoy%20interesado%20en%20la%20obra%20%22${encodeURIComponent(sculpture.title)}%22`;
         }
         
         if (counter) {
@@ -599,18 +599,23 @@ class App {
                             <h3 class="font-heading text-xl font-medium">Contacto</h3>
                             <p>Daniel Guido</p>
                             <p>Escultor costarricense</p>
-                            <a href="https://wa.me/50687922758" 
+                            <a href="https://wa.me/50660204266" 
                                target="_blank" 
                                rel="noopener noreferrer"
                                class="text-primary hover:underline block mt-2">
-                                WhatsApp: +506 8792 2758
+                                WhatsApp: +506  6020 4266
                             </a>
                         </div>
                         
                     </div>
                     
-                    <div class="footer-bottom">
-                        <p>© 2026 Galería Virtual. Todos los derechos reservados.</p>
+                     <div class="footer-bottom">
+                        <p>
+                             © 2026 Galería Virtual. Todos los derechos reservados. 
+                            <span class="made-with-love">
+                                Hecho con el ❤️ por <a href="https://logiclookcr.com" target="_blank" rel="noopener noreferrer">Logic Look</a>
+                            </span>
+                        </p>
                     </div>
                 </div>
             </footer>
@@ -717,26 +722,24 @@ class App {
                             <h3 class="font-heading text-xl font-medium">Contacto</h3>
                             <p>Daniel Guido</p>
                             <p>Escultor costarricense</p>
-                            <a href="https://wa.me/50687922758" 
+                            <a href="https://wa.me/50660204266" 
                                target="_blank" 
                                rel="noopener noreferrer"
                                class="text-primary hover:underline block mt-2">
-                                WhatsApp: +506 8792 2758
+                                WhatsApp: +506 6020 4266
                             </a>
                         </div>
                         
-                        <div class="footer-section">
-                            <h3 class="font-heading text-xl font-medium">Tecnologías</h3>
-                            <div class="tech-tags">
-                                <span class="tech-tag">Next.js</span>
-                                <span class="tech-tag">React</span>
-                                <span class="tech-tag">WebAR</span>
-                            </div>
-                        </div>
+                         
                     </div>
                     
                     <div class="footer-bottom">
-                        <p>© 2025 Galería Virtual. Todos los derechos reservados.</p>
+                        <p>
+                             © 2026 Galería Virtual. Todos los derechos reservados. 
+                            <span class="made-with-love">
+                                Hecho con el ❤️ por <a href="https://logiclookcr.com" target="_blank" rel="noopener noreferrer">Logic Look</a>
+                            </span>
+                        </p>
                     </div>
                 </div>
             </footer>
