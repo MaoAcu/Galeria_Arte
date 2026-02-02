@@ -1271,28 +1271,7 @@ button.lightbox-close::before {
     }
 }
 
-/* Si Lucide JS se carga, asegurar que los iconos SVG sean visibles */
-.btn-outline i[data-lucide] svg,
-.btn-primary i[data-lucide] svg {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* Cuando Lucide se cargue, ocultar los iconos de respaldo */
-.btn-outline i[data-lucide]:has(svg)::before,
-.btn-primary i[data-lucide]:has(svg)::before {
-    display: none !important;
-}
-.gallery-header-content button i[data-lucide="arrow-left"]:empty::after {
-    content: "←";
-    display: inline-block;
-}
-
-.gallery-header-content a.btn-primary i[data-lucide="external-link"]:empty::after {
-    content: "↗";
-    display: inline-block;
-}
+ 
 /* ============================================= */
 /* MODAL AR */
 /* ============================================= */

@@ -1,3 +1,4 @@
+
 // Estados de la aplicación
 const AppState = {
     LOADING: 'loading',
@@ -646,28 +647,29 @@ class App {
     renderGallery() {
         this.appElement.innerHTML = `
             <!-- HEADER -->
+            
             <header class="gallery-header">
-    <div class="container">
-        <div class="gallery-header-content">
-            <button class="btn-outline" data-action="go-back">
-                <i data-lucide="arrow-left"></i>
-                <span class="hidden sm:inline">Volver</span>
-            </button>
+                <div class="container">
+                    <div class="gallery-header-content">
+                        <button class="btn-outline" data-action="go-back">
+                            <i data-lucide="arrow-left"></i> <!-- Sigue igual -->
+                            <span class="hidden sm:inline">Volver</span>
+                        </button>
             
-            <h1 class="font-heading">
-                Colección de Esculturas
-            </h1>
+                   <h1 class="font-heading">
+                         Colección de Esculturas
+                    </h1>
             
-            <a href="https://wa.me/50660204266?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="btn-primary">
-                <i data-lucide="external-link"></i>
-                <span class="hidden sm:inline">Contactar</span>
-            </a>
-        </div>
-    </div>
-</header>
+                    <a href="https://wa.me/50660204266?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-primary">
+                        <i data-lucide="external-link"></i> <!-- Sigue igual -->
+                        <span class="hidden sm:inline">Contactar</span>
+                    </a>
+                    </div>
+                </div>
+           </header>
 
             <!-- INTRO SECTION -->
             <section class="gallery-title-section">
