@@ -653,7 +653,7 @@ class App {
                 Colección de Esculturas
             </h1>
             
-            <a href="https://wa.me/50687922758?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual"
+            <a href="https://wa.me/50660204266?text=Hola%20Daniel,%20estoy%20interesado%20en%20una%20obra%20de%20tu%20galería%20virtual"
                target="_blank"
                rel="noopener noreferrer"
                class="btn-primary">
