@@ -1,6 +1,4 @@
-/* ============================================= */
-/* VARIABLES Y RESET */
-/* ============================================= */
+ 
 :root {
     /* Colores inspirados en museo/terracota */
     --color-primary: #8B4513; /* Sienna */
@@ -58,9 +56,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ============================================= */
-/* UTILIDADES */
-/* ============================================= */
+ 
 .container {
     width: 100%;
     max-width: 1200px;
@@ -164,9 +160,9 @@ body {
 .object-cover { object-fit: cover; }
 .object-contain { object-fit: contain; }
 
-/* ============================================= */
+ 
 /* LOADER GLOBAL */
-/* ============================================= */
+ 
 .global-loader {
     position: fixed;
     top: 0;
@@ -235,9 +231,9 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* ============================================= */
+ 
 /* ESTILOS GENERALES */
-/* ============================================= */
+ 
 section {
     padding: var(--spacing-xxl) 0;
 }
@@ -323,10 +319,9 @@ button {
     background-color: var(--color-primary);
     color: var(--color-white);
 }
-
-/* ============================================= */
+ 
 /* HEADER Y NAVEGACIÓN */
-/* ============================================= */
+ 
 .main-header {
     position: sticky;
     top: 0;
@@ -342,11 +337,15 @@ button {
     justify-content: space-between;
 }
 
-/* ============================================= */
+ 
 /* HERO SECTION (Pantalla de bienvenida) */
-/* ============================================= */
+ 
 .hero-section {
-    background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-gray-dark) 100%);
+   
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.85) 0%, rgba(45, 45, 45, 0.7) 100%),url('/static/images/header.png'); 
+    background-size: cover;          
+    background-position: center;      
+    background-repeat: no-repeat;
     color: var(--color-white);
     padding: var(--spacing-xxl) 0;
     min-height: 80vh;
@@ -359,7 +358,6 @@ button {
     max-width: 800px;
     margin: 0 auto;
 }
-
 .hero-subtitle {
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -1373,4 +1371,67 @@ button.lightbox-close::before {
     .mode-card {
         padding: var(--spacing-lg);
     }
+
+    /* Lazy loading styles */
+.lazy-image {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    background-color: #f0f0f0;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+/* Skeleton loading para imágenes */
+.sculpture-image {
+    position: relative;
+    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.sculpture-image img {
+    position: relative;
+    z-index: 1;
+}
+
+.sculpture-image img.loaded {
+    background: none;
+    animation: none;
+}
+
+/* Mejoras de accesibilidad */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Mejoras de rendimiento */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Reduce repaints */
+.will-change-transform {
+    will-change: transform;
+}
 }

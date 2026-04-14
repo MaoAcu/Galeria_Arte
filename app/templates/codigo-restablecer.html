@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña · Daniel Guido Escultor</title>
+    <!-- Fuentes artísticas -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/codigoRestablecer.css') }}">
+</head>
+<body>
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="modalClose">&times;</span>
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="modalTitle">¡Éxito!</h2>
+            <p id="modalMessage">Código verificado correctamente</p>
+        </div>
+    </div>
+
+    <main class="artist-card">
+        <!-- Sello del artista -->
+        <div class="artist-seal">
+            <div class="seal-icon">
+                <i class="fas fa-sculpture"></i>
+            </div>
+            <h1>DANIEL GUIDO</h1>
+            <div class="subtitle">ESCULTOR COSTARRICENSE</div>
+        </div>
+
+        <div class="reset-header">
+            <h2>RESTABLECER</h2>
+            <div class="lead">
+                <i class="fas fa-envelope"></i>
+                Ingresa el código de 6 dígitos enviado a tu correo
+            </div>
+        </div>
+
+        <!-- Sección de código -->
+        <div class="form-section active" id="codeSection">
+            <!-- Mensaje de error -->
+            <div class="error-message" id="codeError">
+                <span class="error-icon">❌</span>
+                <span class="error-text">Código incorrecto. Verifica e intenta de nuevo.</span>
+            </div>
+
+            <form id="codeForm">
+                <!-- Contenedor de los 6 inputs -->
+                <div class="otp-wrapper" id="otpContainer">
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                </div>
+
+                <!-- Campo oculto para el código completo -->
+                <input type="hidden" id="codigoCompleto" name="codigo">
+
+                <button type="submit" class="btn-verificar" id="submitBtn">
+                    VERIFICAR CÓDIGO
+                </button>
+            </form>
+
+            <div class="footer-links">
+                ¿No recibiste el código?<br>
+                <a href="#" class="resend-link" id="resendCode">
+                    <i class="fas fa-redo-alt"></i>
+                    Reenviar código
+                </a>
+            </div>
+        </div>
+
+        <!-- pie decorativo -->
+        <div class="artist-footer">
+            <i class="fas fa-tree"></i>
+            <span>✦</span> TALLA DIRECTA <span>✦</span>
+            <i class="fas fa-feather"></i>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/codigoRestablecer.js') }}"></script>
+</body>
+</html>

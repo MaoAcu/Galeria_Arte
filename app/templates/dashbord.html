@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Dashboard · Daniel Guido Escultor</title>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Fuentes artísticas -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader" class="loader-container">
+        <div class="spinner"></div>
+        <p>Cargando galería...</p>
+    </div>
+
+    <!-- Modal confirmación eliminar -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div class="modal-body">
+                <h3 id="deleteModalTitle">¿Eliminar esta obra?</h3>
+                <p id="deleteModalMessage">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn-confirm" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal informativo -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-card modal-info">
+            <div class="modal-icon" id="infoModalIcon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="modal-body">
+                <h3 id="infoModalTitle">Éxito</h3>
+                <p id="infoModalMessage">Operación completada correctamente.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="closeInfoModal()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar colección -->
+    <div id="coleccionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="coleccionModalTitle">Nueva Colección</h3>
+                <span class="close-modal" onclick="closeColeccionModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="coleccionForm">
+                    <input type="hidden" id="coleccionId">
+                    <div class="form-group">
+                        <label for="coleccionNombre">Nombre de la colección</label>
+                        <input type="text" id="coleccionNombre" required placeholder="Ej: Serie Guardiana">
+                    </div>
+                    <div class="form-group">
+                        <label for="coleccionIcono">Icono representativo</label>
+                        <select id="coleccionIcono" required>
+                            <option value="fa-tree">🌳 Madera</option>
+                            <option value="fa-feather">🪶 Pluma</option>
+                            <option value="fa-mountain">⛰️ Montaña</option>
+                            <option value="fa-leaf">🍃 Hoja</option>
+                            <option value="fa-dove">🕊️ Paz</option>
+                            <option value="fa-crown">👑 Realeza</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeColeccionModal()">Cancelar</button>
+                        <button type="submit" class="btn-save">Guardar Colección</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <div class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-sculpture"></i> Daniel Guido</h2>
+                <p class="artist-subtitle">ESCULTOR COSTARRICENSE</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">COLECCIONES</div>
+                <ul id="coleccionesList"></ul>
+                <div class="sidebar-divider"></div>
+            </nav>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <p class="user-name">Daniel Guido</p>
+                        <p class="user-role">Escultor</p>
+                    </div>
+                </div>
+                <a href="javascript:void(0)" id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="top-bar">
+                <button id="menuToggle" class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 id="sectionTitle">Gestionar Colecciones</h1>
+                <div class="header-actions">
+                    <button id="saveAllBtn" class="btn-save" style="display: none;">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </header>
+
+            <!-- Sección de colecciones -->
+            <div id="coleccionesSection" class="content-section" style="display: block;">
+                <div class="section-header">
+                    <h2><i class="fas fa-layer-group"></i> Todas las Colecciones</h2>
+                    <button id="btnNuevaColeccionHeader" class="btn-add-item">
+                        <i class="fas fa-plus"></i> Nueva Colección
+                    </button>
+                </div>
+                <div id="coleccionesGrid" class="categorias-grid"></div>
+            </div>
+
+            <!-- Sección de esculturas -->
+            <div id="esculturasSection" class="content-section"></div>
+
+            <!-- Sección de Configuración -->
+            <div id="configSection" class="content-section" style="display: none;">
+                <div class="config-container">
+                    <h2><i class="fas fa-cog"></i> Configuración del Artista</h2>
+                    <div class="config-grid">
+                        <div class="config-card">
+                            <h3><i class="fas fa-palette"></i> Información del Artista</h3>
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>Nombre del Artista</label>
+                                    <input type="text" id="artistName" value="Daniel Guido">
+                                </div>
+                                <div class="form-group">
+                                    <label>Biografía</label>
+                                    <textarea id="artistBio" rows="4">Escultor costarricense especializado en talla directa de madera. Sus obras exploran la conexión entre la identidad cultural y las formas orgánicas.</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Foto de perfil</label>
+                                    <div class="image-upload-container" onclick="document.getElementById('profileImage').click()">
+                                        <i class="fas fa-camera"></i>
+                                        <p>Cambiar foto</p>
+                                        <input type="file" id="profileImage" accept="image/*" style="display: none;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-card">
+                            <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>Cambiar Contraseña</label>
+                                    <input type="password" id="newPassword" placeholder="Nueva contraseña">
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirmar</label>
+                                    <input type="password" id="confirmPassword" placeholder="Confirmar contraseña">
+                                </div>
+                                <div class="form-group">
+                                    <label>WhatsApp</label>
+                                    <input type="text" id="whatsappNumber" value="+506 6020 4266">
+                                </div>
+                                <button id="saveConfigBtn" class="btn-save">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante para volver a colecciones -->
+    <button id="fabColecciones" class="fab-categorias" style="display: none;" onclick="switchSection('colecciones')">
+        <i class="fas fa-layer-group"></i>
+        <span>Ver Colecciones</span>
+    </button>
+
+    <!-- Modal para editar escultura -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Editar Escultura</h3>
+                <span class="close-modal" onclick="closeItemModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="sculptureForm" enctype="multipart/form-data">
+                    <input type="hidden" id="sculptureId" name="id">
+                    
+                    <div class="form-group">
+                        <label for="sculptureTitle">Título de la Obra</label>
+                        <input type="text" id="sculptureTitle" name="titulo" required placeholder="Ej: Guardián del Silencio">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sculptureYear">Año</label>
+                            <input type="text" id="sculptureYear" name="año" placeholder="2025">
+                        </div>
+                        <div class="form-group">
+                            <label for="sculptureMaterial">Material</label>
+                            <input type="text" id="sculptureMaterial" name="material" placeholder="Madera de cedro">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="coleccion">Colección</label>
+                        <select id="coleccion" name="coleccion" class="form-control" required>
+                            <option value="">Seleccionar colección</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sculptureDescription">Descripción</label>
+                        <textarea id="sculptureDescription" name="descripcion" rows="4" placeholder="Describe la obra, su significado, técnicas..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sculptureImageFile">Imagen de la Obra</label>
+                        <div class="image-upload-container">
+                            <input type="file" id="sculptureImageFile" name="image" accept=".jpg,.jpeg,.png,.webp" style="display: none;">
+                            <div class="image-preview" id="imagePreview">
+                                <img src="" alt="Vista previa" style="max-width: 100%; max-height: 150px; display: none;">
+                            </div>
+                            <div class="image-actions">
+                                <button type="button" class="btn-image-upload" onclick="document.getElementById('sculptureImageFile').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen
+                                </button>
+                                <span id="imageFileName" class="file-name"></span>
+                            </div>
+                        </div>
+                        <small>Formatos: JPG, PNG, WEBP · Tamaño máx: 10MB</small>
+                        <input type="hidden" id="sculptureImageUrl" name="imagen_url" value="">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sculptureStatus">Estado</label>
+                        <div class="status-toggle">
+                            <button type="button" class="status-btn active" data-status="active">En exhibición</button>
+                            <button type="button" class="status-btn" data-status="inactive">En bodega</button>
+                            <input type="hidden" id="sculptureStatus" name="estado" value="active">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>¿Obra destacada?</label>
+                        <div class="estrellas-container">
+                            <button type="button" class="estrella-simple" id="estrellaSimple" data-destacado="0">
+                                <i class="far fa-star"></i>
+                            </button>
+                            <span id="destacadoText">No destacada</span>
+                            <input type="hidden" id="sculptureDestacada" name="destacada" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeItemModal()">Cancelar</button>
+                        <button type="submit" class="btn-save">Guardar Obra</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

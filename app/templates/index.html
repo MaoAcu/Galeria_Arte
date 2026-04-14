@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- SEO Meta Tags -->
+    <title>Galería Virtual | Daniel Guido - Escultor Costarricense en Madera</title>
+    <meta name="description" content="Explora la colección única de esculturas en madera de Daniel Guido, escultor costarricense. Galería virtual con imágenes en alta calidad y vista detallada.">
+    <meta name="keywords" content="esculturas, madera, Daniel Guido, artista costarricense, galería virtual, arte en madera, tallado">
+    <meta name="author" content="Daniel Guido">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Galería Virtual | Daniel Guido - Escultor Costarricense">
+    <meta property="og:description" content="Explora la colección única de esculturas en madera de Daniel Guido">
+    <meta property="og:image" content="https://mapatico.com/gallery/soyDaniel.jpg">
+    <meta property="og:url" content="https://mapatico.com">
+    <meta property="og:site_name" content="Galería Virtual Daniel Guido">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Galería Virtual | Daniel Guido">
+    <meta name="twitter:description" content="Esculturas en madera de Daniel Guido">
+    <meta name="twitter:image" content="https://mapatico.com/gallery/soyDaniel.jpg">
+    
+    <!-- Preconnect para recursos externos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://mapatico.com">
+    
+    <!-- Preload de CSS  -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap">
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Stylesheet con hash para cache busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=2">
+    
+  
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖼️%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="https://mapatico.com/gallery/soyDaniel.jpg">
+    
+  
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ArtGallery",
+        "name": "Galería Virtual Daniel Guido",
+        "url": "https://mapatico.com",
+        "description": "Galería virtual de esculturas en madera del artista costarricense Daniel Guido",
+        "artist": {
+            "@type": "Person",
+            "name": "Daniel Guido",
+            "jobTitle": "Escultor",
+            "nationality": "Costarricense"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Loader Global con mejor accesibilidad -->
+    <div class="global-loader" id="global-loader" role="status" aria-label="Cargando galería">
+        <div class="loader-spinner" aria-hidden="true"></div>
+        <h3>Cargando Galería Virtual</h3>
+        <p id="loader-status">Cargando estructura de la galería...</p>
+        <div id="loader-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div id="loader-progress-bar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div id="app"></div>
+
+    <!-- Scripts optimizados -->
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=2" defer></script>
+</body>
+</html>

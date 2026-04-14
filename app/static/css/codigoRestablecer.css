@@ -1,0 +1,435 @@
+ 
+        :root {
+            --color-primary: #8B4513; /* Sienna */
+            --color-secondary: #D2691E; /* Chocolate */
+            --color-accent: #CD5C5C; /* Indian Red */
+            --color-light: #F5F5F5;
+            --color-dark: #333333;
+            --color-white: #FFFFFF;
+            --color-gray: #808080;
+            --color-gray-light: #E0E0E0;
+            --color-gray-dark: #4A4A4A;
+            
+            --font-heading: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', system-ui, sans-serif;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            --border-radius: 8px;
+            --border-radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(165deg, #2c1810 0%, #4a2a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+            position: relative;
+        }
+
+        /* Textura de madera/papel artesanal */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><filter id="wood"><feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="2"/></filter><rect width="100" height="100" filter="url(%23wood)" opacity="0.08"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* MODAL DE CONFIRMACIÓN */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            max-width: 400px;
+            width: 90%;
+            padding: var(--spacing-xl);
+            text-align: center;
+            position: relative;
+            animation: modalPop 0.3s ease;
+            border: 1px solid var(--color-secondary);
+        }
+
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-gray);
+            transition: color var(--transition-fast);
+        }
+
+        .close-modal:hover {
+            color: var(--color-accent);
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--color-secondary);
+        }
+
+        .modal h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .modal p {
+            color: var(--color-gray-dark);
+            font-size: 1rem;
+        }
+
+        /* Tarjeta principal */
+        .artist-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            max-width: 500px;
+            width: 100%;
+            padding: var(--spacing-xxl);
+            box-shadow: var(--shadow-lg), 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(210, 105, 30, 0.2);
+        }
+
+        /* Logo / sello del artista */
+        .artist-seal {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+        }
+
+        .seal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-white);
+            font-size: 2.5rem;
+            border: 3px solid var(--color-white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .artist-seal h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--color-primary);
+            letter-spacing: 2px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .artist-seal .subtitle {
+            font-size: 0.8rem;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-top: 1px solid var(--color-gray-light);
+            border-bottom: 1px solid var(--color-gray-light);
+            padding: var(--spacing-xs) 0;
+            display: inline-block;
+        }
+
+        /* Header de restablecimiento */
+        .reset-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .reset-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--color-dark);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .reset-header .lead {
+            color: var(--color-gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .reset-header .lead i {
+            color: var(--color-secondary);
+            margin-right: var(--spacing-xs);
+        }
+
+        /* Mensaje de error */
+        .error-message {
+            background: rgba(205, 92, 92, 0.1);
+            border-left: 4px solid var(--color-accent);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+            align-items: center;
+            gap: var(--spacing-sm);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 1.2rem;
+        }
+
+        .error-text {
+            color: var(--color-accent);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        /* Campos OTP */
+        .otp-wrapper {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+
+        .otp-input {
+            width: 60px;
+            height: 70px;
+            border: 2px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            font-size: 2rem;
+            text-align: center;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--color-primary);
+            background: var(--color-white);
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+            box-shadow: 0 0 0 3px rgba(210, 105, 30, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .otp-input::-webkit-outer-spin-button,
+        .otp-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Botón de verificación */
+        .btn-verificar {
+            width: 100%;
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border: none;
+            border-radius: var(--border-radius);
+            color: var(--color-white);
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .btn-verificar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-verificar:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-verificar:hover::before {
+            left: 100%;
+        }
+
+        .btn-verificar:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Enlaces del footer */
+        .footer-links {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            color: var(--color-gray);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .resend-link {
+            color: var(--color-secondary);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            border-bottom: 1px dashed transparent;
+            margin-top: var(--spacing-xs);
+            font-weight: 500;
+        }
+
+        .resend-link:hover {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .resend-link i {
+            font-size: 0.9rem;
+        }
+
+        .resend-link.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Footer con sello */
+        .artist-footer {
+            text-align: center;
+            color: var(--color-gray);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--color-gray-light);
+            padding-top: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+        }
+
+        .artist-footer span {
+            color: var(--color-secondary);
+            font-size: 1rem;
+        }
+
+        .artist-footer i {
+            color: var(--color-secondary);
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .artist-card {
+                padding: var(--spacing-xl);
+            }
+
+            .otp-input {
+                width: 45px;
+                height: 55px;
+                font-size: 1.5rem;
+            }
+
+            .artist-seal h1 {
+                font-size: 1.5rem;
+            }
+
+            .reset-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: var(--spacing-lg);
+            }
+        }
+
+        @media (max-width: 380px) {
+            .otp-input {
+                width: 40px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Decoración adicional */
+        .wood-decoration {
+            position: absolute;
+            bottom: var(--spacing-lg);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
+            border-radius: 2px;
+        }

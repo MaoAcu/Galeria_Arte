@@ -1,0 +1,180 @@
+:root {
+            --color-primary: #a67c52; /* Bronce/Arcilla suave */
+            --color-secondary: #d2691e; 
+            --color-text: white;
+            --color-light-bg: #fdfcfb; /* Blanco cálido tipo lienzo */
+            --color-gray-light: #f0f0f0;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-light-bg);
+            /* Sutil textura de papel artesanal */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--color-text);
+        }
+
+        .oasis-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            overflow: hidden;
+            border: 1px solid rgba(166, 124, 82, 0.1);
+        }
+
+        /* Header Claro y Elegante */
+        .login-header {
+            padding: 50px 30px 30px;
+            text-align: center;
+            background:black;
+        }
+
+        .title {
+            font-family: var(--font-heading);
+            font-size: 2.4rem;
+            color: var(--color-text);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        /* Formulario Limpio */
+        .login-form {
+            padding: 20px 40px 40px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1.5px solid #d1d1d1;
+            font-size: 1rem;
+            background: transparent;
+            outline: none;
+            transition: border-color 0.4s;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: -15px;
+            font-size: 0.75rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .input-group input:focus {
+            border-bottom: 1.5px solid var(--color-primary);
+        }
+
+        #togglePassword {
+            position: absolute;
+            right: 0;
+            top: 15px;
+            cursor: pointer;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .forgot-password a {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-password a:hover {
+            color: var(--color-primary);
+        }
+
+        /* Botón Estilo Escultura */
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--color-secondary);  
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;  
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-login:hover {
+            background-color: var(--color-primary);
+            box-shadow: 0 5px 15px rgba(166, 124, 82, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Footer sutil */
+        .oasis-footer {
+            padding: 25px;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #ccc;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Flask Flash Messages */
+        .flash {
+            margin: 0 40px 20px;
+            padding: 10px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .error { background: #fff5f5; color: #c53030; }
+
+        @media (max-width: 480px) {
+            .oasis-card {
+                box-shadow: none;
+                border: none;
+                background: transparent;
+            }
+            body { background-color: #ffffff; }
+        }

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación · Daniel Guido Escultor</title>
+    <!-- Fuentes artísticas -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verificarCodigo.css') }}">
+</head>
+<body>
+    <div id="flash-container"></div>
+
+    <main class="artist-card">
+        <!-- Sello del artista -->
+        <div class="artist-seal">
+            <div class="seal-icon">
+                <i class="fas fa-sculpture"></i>
+            </div>
+            <h1>DANIEL GUIDO</h1>
+            <div class="subtitle">ESCULTOR COSTARRICENSE</div>
+        </div>
+
+        <div class="verification-header">
+            <h2>VERIFICACIÓN</h2>
+            <div class="lead">
+                <i class="fas fa-lock"></i>
+                Ingresa el código de 6 dígitos enviado a tu dispositivo
+            </div>
+        </div>
+
+        <!-- Formulario OTP -->
+        <form method="post" action="/verificar-codigo" id="otp-form">
+            <!-- Campos OTP visibles -->
+            <div class="otp-wrapper" id="otp-container">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>
+            </div>
+
+            <!-- Campo oculto para el código completo -->
+            <input type="hidden" id="codigo" name="codigo">
+
+            <button type="submit" class="btn-verificar" id="submitBtn">
+                <span class="btn-text">VERIFICAR ACCESO</span>
+                <span class="loader">⌛</span>
+            </button>
+
+            <div class="footer-links">
+                <a href="#" class="resend-link" id="resendLink">
+                    <i class="fas fa-redo-alt"></i>
+                    Reenviar código
+                </a>
+            </div>
+        </form>
+
+        <div class="artist-footer">
+            <i class="fas fa-tree"></i>
+            <span>✦</span> TALLA DIRECTA <span>✦</span>
+            <i class="fas fa-feather"></i>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/verificarCodigo.js') }}"></script>
+</body>
+</html>
