@@ -136,22 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = true;
                 codeError.style.display = 'none';
 
-                // SIMULACIÓN - Reemplazar con tu fetch real
-                setTimeout(() => {
-                    // Simular éxito (código "123456" para prueba)
-                    if (codigo === "123456") {
-                        mostrarExito('¡Código correcto!', 'Redirigiendo para restablecer contraseña');
-                        setTimeout(() => {
-                            window.location.href = "/nueva-contrasena";
-                        }, 1500);
-                    } else {
-                        showError("Código incorrecto. Intenta de nuevo");
-                        resetButton();
-                    }
-                }, 1000);
+               
 
-                // --- TU CÓDIGO FETCH REAL (comentado para simulación) ---
-                /*
+                 
                 fetch('/crede/validate_code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -160,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = data.redirect_url || "/nueva-contrasena";
+                        window.location.href = data.redirect_url || URL_nUEVA_CONTRA;
                     } else {
                         showError(data.message || "Código incorrecto");
                         resetButton();
@@ -171,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showError("Error de conexión con el servidor");
                     resetButton();
                 });
-                */
+                 
             });
 
             // --- REENVIAR CÓDIGO ---
@@ -183,21 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
                 resendBtn.classList.add('disabled');
 
-                // SIMULACIÓN - Reemplazar con tu fetch real
-                setTimeout(() => {
-                    mostrarExito('¡Código reenviado!', 'Se ha enviado un nuevo código a tu correo');
-                    
-                    // Limpiar inputs
-                    otpInputs.forEach(inp => inp.value = '');
-                    otpInputs[0].focus();
-                    updateHiddenCode();
-                    
-                    resendBtn.innerHTML = originalText;
-                    resendBtn.classList.remove('disabled');
-                }, 1500);
+                
 
-                // --- TU CÓDIGO FETCH REAL (comentado) ---
-                /*
+                 
                 fetch('/api/resend-recovery-code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
@@ -221,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     resendBtn.innerHTML = originalText;
                     resendBtn.classList.remove('disabled');
                 });
-                */
+                 
             });
 
             // Inicializar campo oculto

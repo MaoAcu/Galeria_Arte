@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash,current_app
 from app import db
+from app.extensions import limiter
 from app.Models.login import Login
 from sqlalchemy import text
 import random
@@ -8,10 +9,11 @@ import threading
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
 
-        correo = request.form.get("usuario")
+        correo = request.form.get("correo")
         password = request.form.get("password")
 
         login = Login.query.filter_by(correo=correo).first()
@@ -45,8 +47,7 @@ def login():
         session.clear()
 
         session["idusuario"] = login.idusuario
-        session["correo"] = login.correo
-        session["local"] = login.local
+        session["correo"] = login.correo 
         idusuario = session.get("idusuario")
         
         app = current_app._get_current_object()
@@ -80,9 +81,10 @@ def SendCode(app,idusuario, correo):
        db.session.execute(sql_update, {"codigo": code, "idusuario": idusuario})
        db.session.commit()
 
-       #email_service.SendVerificationCode(email=correo, code=code)
+       email_service.SendVerificationCode(email=correo, code=code)
        
 @auth_bp.route("/verificar_codigo", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def VerificarCodigo():
     if request.method == "POST":
         codigo_ingresado = request.form.get("codigo")

@@ -223,12 +223,10 @@
 
                 const newPassword = document.getElementById('newPassword').value;
 
-                // Simulación de fetch
+                 
                 setTimeout(() => {
-                    showModal('¡Contraseña actualizada!', 'Tu contraseña se cambió correctamente. Serás redirigido al login.', 'success', '/login');
-                    
-                    // --- TU CÓDIGO FETCH REAL (comentado) ---
-                    /*
+                      
+                     
                     fetch('/crede/update_password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -246,7 +244,7 @@
                         console.error('Error:', error);
                         showModal('Error', 'No se pudo conectar al servidor.', 'error');
                     });
-                    */
+                     
                 }, 800);
             });
 

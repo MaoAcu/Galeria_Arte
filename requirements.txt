@@ -1,2 +1,9 @@
 flask==3.1.2
-dotenv
+python-dotenv
+flask-cors
+Flask-Limiter
+flask-sqlalchemy
+pymysql
+bcrypt
+Pillow
+

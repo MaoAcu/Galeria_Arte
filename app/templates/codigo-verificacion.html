@@ -32,7 +32,7 @@
         </div>
 
         <!-- Formulario OTP -->
-        <form method="post" action="/verificar-codigo" id="otp-form">
+        <form method="post" action="{{ url_for('auth.VerificarCodigo') }}" id="otp-form">
             <!-- Campos OTP visibles -->
             <div class="otp-wrapper" id="otp-container">
                 <input type="text" class="otp-input" maxlength="1" inputmode="numeric" autocomplete="off" required>

@@ -1,5 +1,5 @@
  // Variable para la redirección
-        const CODIGO_URL = "/codigo-restablecer";
+         
 
         document.addEventListener('DOMContentLoaded', function() {
             const procesarBtn = document.getElementById('procesarBtn');
@@ -32,20 +32,9 @@
                 procesarBtn.disabled = true;
                 emailError.innerHTML = ''; 
 
-                // SIMULACIÓN - Reemplazar con tu fetch real
-                setTimeout(() => {
-                    // Simular éxito (cualquier email con @guido.art o @gmail.com funciona)
-                    if (usuario.includes('@')) {
-                        localStorage.setItem('tipoUsuario', TIPO_RECUPERACION);
-                        window.location.href = CODIGO_URL;
-                    } else {
-                        emailError.innerHTML = `<div class="error-text"><i class="fas fa-exclamation-circle"></i> Este correo no está registrado</div>`;
-                        resetButton();
-                    }
-                }, 1500);
+                
 
-                // --- TU CÓDIGO FETCH REAL (comentado para simulación) ---
-                /*
+                
                 fetch('/crede/validar_usuario', {
                     method: 'POST',
                     headers: {
@@ -60,7 +49,7 @@
                 .then(data => {
                     if (data.success) {
                         localStorage.setItem('tipoUsuario', data.tipo);
-                        window.location.href = CODIGO_URL;
+                        window.location.href = URL_RECUPERAR;
                     } else {
                         emailError.innerHTML = `<div class="error-text"><i class="fas fa-exclamation-circle"></i> ${data.message}</div>`;
                         resetButton();
@@ -71,7 +60,7 @@
                     emailError.innerHTML = '<div class="error-text"><i class="fas fa-exclamation-circle"></i> Error de conexión</div>';
                     resetButton();
                 });
-                */
+                
             });
 
             // Función para validar email

@@ -260,6 +260,23 @@
                         <small>Formatos: JPG, PNG, WEBP · Tamaño máx: 10MB</small>
                         <input type="hidden" id="sculptureImageUrl" name="imagen_url" value="">
                     </div>
+
+                    <div class="form-group" id="artistImageUpload" style="display:none">
+                        <label for="artistImageFile">Foto del Artista</label>
+                        <div class="image-upload-container">
+                            <input type="file" id="artistImageFile" name="artist_image" accept=".jpg,.jpeg,.png,.webp" style="display: none;">
+                            <div class="image-preview" id="artistImagePreview">
+                                <img src="" alt="Vista previa" style="max-width: 100%; max-height: 150px; display: none;">
+                            </div>
+                            <div class="image-actions">
+                                <button type="button" class="btn-image-upload" onclick="document.getElementById('artistImageFile').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i> Seleccionar foto
+                                </button>
+                                <span id="artistImageFileName" class="file-name"></span>
+                            </div>
+                        </div>
+                        <small>Opcional · Formatos: JPG, PNG, WEBP</small>
+                    </div>
                     
                     <div class="form-group">
                         <label for="sculptureStatus">Estado</label>

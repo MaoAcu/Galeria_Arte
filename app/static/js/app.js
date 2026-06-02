@@ -9,12 +9,13 @@ const lazyLoadConfig = {
 const AppState = {
     LOADING: 'loading',
     WELCOME: 'welcome',
-    GALLERY: 'gallery'
+    GALLERY: 'gallery',
+    IMMERSIVE: 'immersive' 
 };
 
 // Datos de las esculturas 
 let sculptures = [];
-
+ 
 async function loadEsculturas() {
     try {
         const response = await fetch('/escultura/GetEsculturas', {
@@ -39,7 +40,11 @@ async function loadEsculturas() {
             year: item.year,
             material: item.material,
             description: item.description,
-            image: item.image.startsWith('http') ? item.image : `/static/images/esculturas/${item.image}`,
+            image: item.image
+                ? (item.image.startsWith('http://') || item.image.startsWith('https://')
+                    ? item.image
+                    : URL_GALLERY + '/' + item.image)
+                : URL_GALLERY + '/placeholder.jpg',
             alt: item.alt || item.title,
             width: item.width || 800,
             height: item.height || 600,
@@ -351,6 +356,12 @@ class App {
         this.appElement = document.getElementById('app');
         this.lightbox = null;
         this.lazyLoader = null;
+        this.immersiveScene = null;
+        this.quotesDisplay = null;
+        this.cinematicCamera = null;
+        this.soundAmbient = null;
+        this._immersiveLoadId = 0;
+
         this.init();
     }
 
@@ -404,7 +415,6 @@ class App {
             if (this.lazyLoader && this.currentState === AppState.GALLERY) {
                 this.lazyLoader.observeImages();
             }
-            this.attachEventListeners();
         }, 100);
     }
 
@@ -446,10 +456,49 @@ class App {
                 });
             });
         });
+        const immersiveBtn = document.querySelector('[data-action="go-to-immersive"]');
+    if (immersiveBtn) {
+        immersiveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Activar el modo inmersivo
+            this.setState(AppState.IMMERSIVE);
+        });
     }
+    
+    const exitImmersiveBtn = document.querySelector('[data-action="exit-immersive"]');
+    if (exitImmersiveBtn) {
+        exitImmersiveBtn.addEventListener('click', () => {
+            if (this._igCleanup) {
+                this._igCleanup();
+                this._igCleanup = null;
+            }
+            if (this.immersiveScene) {
+                this.immersiveScene.dispose();
+                this.immersiveScene = null;
+            }
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
+            this.setState(AppState.WELCOME);
+        });
+    }
+}
 
     render() {
         if (!this.appElement) return;
+
+        if (this._igCleanup) {
+            this._igCleanup();
+            this._igCleanup = null;
+        }
+        if (this.immersiveScene) {
+            this.immersiveScene.dispose();
+            this.immersiveScene = null;
+        }
+        if (document.pointerLockElement) {
+            document.exitPointerLock();
+        }
+
         this.appElement.innerHTML = '';
         
         switch (this.currentState) {
@@ -458,6 +507,9 @@ class App {
                 break;
             case AppState.GALLERY:
                 this.renderGallery();
+                break;
+            case AppState.IMMERSIVE:
+                this.renderImmersiveExperience();
                 break;
         }
         
@@ -537,7 +589,7 @@ class App {
                         </div>
                     </div>
                 </section>
-
+             
                 <section class="mode-section">
                     <div class="container">
                         <div class="mode-header">
@@ -550,9 +602,9 @@ class App {
                         <div class="mode-cards">
                             <div class="mode-card">
                                 <div class="mode-icon" aria-hidden="true">
-                                    <i data-lucide="image"></i>
+                                    <i data-lucide="layout-grid"></i>
                                 </div>
-                                <h3 class="mode-card-title font-heading text-2xl font-medium">Galería Normal</h3>
+                                <h3 class="mode-card-title">Galería Clásica</h3>
                                 <p class="mode-card-description">
                                     Explora todas las esculturas en formato de galería tradicional con
                                     imágenes de alta calidad y descripciones detalladas.
@@ -562,7 +614,20 @@ class App {
                                     <i data-lucide="arrow-right" aria-hidden="true"></i>
                                 </a>
                             </div>
-                            
+                            <div class="mode-card" style="border-color: rgba(201,169,110,0.3); background: linear-gradient(145deg, #fdfaf5 0%, #faf6ef 100%);">
+                                <div class="mode-icon" style="background: linear-gradient(135deg, #c9a96e, #8b6914); color: #fff;">
+                                    <i data-lucide="eye"></i>
+                                </div>
+                                <h3 class="mode-card-title">Experiencia Inmersiva</h3>
+                                <p class="mode-card-description">
+                                    Sumérgete en una galería virtual 3D donde recorres un pasillo 
+                                    contemplativo. Contempla cada obra con iluminación ambiental.
+                                </p>
+                                <a href="#" class="mode-card-link" data-action="go-to-immersive" style="background: linear-gradient(125deg, #c9a96e, #a67c3d); color: #fff; border-color: transparent; box-shadow: 0 4px 16px rgba(201,169,110,0.25);">
+                                    Comenzar experiencia
+                                    <i data-lucide="sparkles" aria-hidden="true"></i>
+                                </a>
+                            </div>
                             <div class="mode-card coming-soon">
                                 <div class="badge">
                                     <i data-lucide="construction" aria-hidden="true"></i>
@@ -571,7 +636,7 @@ class App {
                                 <div class="mode-icon" aria-hidden="true">
                                     <i data-lucide="smartphone"></i>
                                 </div>
-                                <h3 class="mode-card-title font-heading text-2xl font-medium">Realidad Aumentada</h3>
+                                <h3 class="mode-card-title">Realidad Aumentada</h3>
                                 <p class="mode-card-description">
                                     Visualiza las esculturas en tu espacio físico utilizando la cámara
                                     de tu dispositivo móvil con tecnología WebAR.
@@ -752,6 +817,246 @@ class App {
             </footer>
         `;
     }
+    
+
+
+async renderImmersiveExperience() {
+    var loadId = ++this._immersiveLoadId;
+    var data, invitadosData;
+    try {
+        var resp = await fetch('/escultura/GetEsculturas', { method: 'GET', headers: { 'Accept': 'application/json' } });
+        data = await resp.json();
+    } catch(e) {
+        data = sculptures;
+    }
+    if (this._immersiveLoadId !== loadId) return;
+
+    try {
+        var respInv = await fetch('/escultura/GetInvitados', { method: 'GET', headers: { 'Accept': 'application/json' } });
+        invitadosData = await respInv.json();
+    } catch(e) {
+        invitadosData = [];
+    }
+    if (this._immersiveLoadId !== loadId) return;
+    if (!data || data.length === 0) {
+        this.appElement.innerHTML = '<div style="color:#c9a96e;text-align:center;padding:4rem;">No hay esculturas disponibles. <button class="immersive-exit" data-action="exit-immersive" style="position:static;margin-top:1rem;border:1px solid #c9a96e;background:transparent;color:#c9a96e;padding:10px 20px;border-radius:8px;cursor:pointer;">Volver</button></div>';
+        this.attachEventListeners();
+        return;
+    }
+    var arts = data.map(function(item) {
+        var url = item.image
+            ? (item.image.startsWith('http://') || item.image.startsWith('https://') ? item.image : URL_GALLERY + '/' + item.image)
+            : URL_GALLERY + '/placeholder.jpg';
+        return {
+            id: item.id,
+            title: item.title,
+            artist: item.artist,
+            year: item.year,
+            material: item.material,
+            description: item.description,
+            image: url,
+            width: item.width || 800,
+            height: item.height || 600,
+            imgEl: null
+        };
+    });
+
+    this.appElement.innerHTML =
+    '<style id="immersive-inline-styles">' +
+        '.imm-scene-wrap{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;background:#0a0a0a}' +
+        '.imm-scene-wrap canvas{display:block;width:100%;height:100%}' +
+        '.imm-hud{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);padding:10px 20px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);font-size:0.75rem;letter-spacing:1px;text-align:center;pointer-events:none;font-family:sans-serif}' +
+        '.imm-hud kbd{display:inline-block;background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:3px;margin:0 2px;font-size:0.7rem;color:#c9a96e}' +
+        '.imm-ex{position:fixed;top:1.5rem;right:1.5rem;z-index:200;pointer-events:all;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.4s;font-size:1.1rem;font-family:sans-serif}' +
+        '.imm-ex:hover{background:rgba(255,255,255,0.15);color:#fff;transform:scale(1.08)}' +
+        '@media(max-width:768px){.imm-hud{font-size:0.6rem;padding:6px 12px;bottom:15px}.imm-ex{top:0.8rem;right:0.8rem;width:36px;height:36px;font-size:0.9rem}}' +
+        '.rg-over{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:50;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.6s ease}' +
+        '.rg-over.activo{opacity:1;pointer-events:auto}' +
+        '.rg-card{background:rgba(18,24,36,0.9);backdrop-filter:blur(18px);border:1px solid rgba(71,85,105,0.3);border-radius:2rem;padding:1.8rem 1.6rem;width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;box-shadow:0 30px 50px rgba(0,0,0,0.6);text-align:center}' +
+        '.rg-card h2{font-size:1.5rem;color:#c9a96e;font-family:"Playfair Display",serif;margin-bottom:0.2rem}' +
+        '.rg-card .rg-sub{color:#8b949e;font-size:0.82rem;margin-bottom:1rem}' +
+        '.rg-img{width:100%;margin-bottom:1rem;border-radius:14px;overflow:hidden;border:2px solid rgba(201,169,110,0.3)}' +
+        '.rg-img img{width:100%;display:block;max-height:200px;object-fit:cover}' +
+        '.rg-btns{display:flex;gap:10px;width:100%}' +
+        '.rg-dl{flex:1;background:linear-gradient(125deg,#c9a96e,#a67c3d);border:none;color:#0a0a0a;font-weight:600;font-size:1rem;padding:0.8rem 1.2rem;border-radius:3rem;cursor:pointer;box-shadow:0 8px 20px rgba(201,169,110,0.3);transition:transform 0.2s,box-shadow 0.25s;display:flex;align-items:center;justify-content:center;gap:0.3rem}' +
+        '.rg-dl:hover{transform:translateY(-3px);box-shadow:0 14px 26px rgba(201,169,110,0.4)}' +
+        '.rg-cl{min-width:90px;background:transparent;border:1px solid rgba(139,148,158,0.3);color:#8b949e;font-size:0.85rem;padding:0.8rem 1rem;border-radius:3rem;cursor:pointer;transition:all 0.3s}' +
+        '.rg-cl:hover{color:#c9a96e;border-color:#c9a96e}' +
+        '.pr-stage{position:relative;width:100%;margin-top:0.2rem;display:none}' +
+        '.pr-stage.show{display:flex;flex-direction:column;align-items:center}' +
+        '.pr-sky{position:relative;width:100%;height:160px;display:flex;justify-content:center;align-items:flex-end}' +
+        '.pr-w{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);width:60px;height:60px;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.5));z-index:10}' +
+        '.pr-w svg{width:100%;height:100%;display:block}' +
+        '.pr-l{stroke:#c9a96e;stroke-width:1.8;stroke-dasharray:4 3;opacity:0;transition:opacity 0.25s}' +
+        '.pr-c{fill:#c9a96e;stroke:#dccaa0;stroke-width:1.7;opacity:0;transition:opacity 0.2s}' +
+        '.pr-a{fill:#e2e8f0;stroke:#c9a96e;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}' +
+        '.pr-ck{opacity:0;fill:none;stroke:#00e676;stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;transition:opacity 0.2s}' +
+        '.pr-w.rising{animation:rgShootUp 0.7s cubic-bezier(0.33,1,0.68,1) forwards}' +
+        '.pr-w.falling{animation:rgFloatDown 3.6s linear forwards,rgSway 1.3s ease-in-out infinite alternate}' +
+        '.pr-w.falling .pr-l,.pr-w.falling .pr-c{opacity:1}' +
+        '.pr-w.success .pr-a,.pr-w.success .pr-l,.pr-w.success .pr-c{opacity:0}' +
+        '.pr-w.success .pr-ck{opacity:1;animation:rgPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards}' +
+        '@keyframes rgShootUp{0%{bottom:50px;transform:translateX(-50%) scale(1);opacity:1}85%{opacity:0.9}100%{bottom:145px;transform:translateX(-50%) scale(0.8);opacity:0}}' +
+        '@keyframes rgFloatDown{0%{bottom:145px}100%{bottom:50px}}' +
+        '@keyframes rgSway{0%{transform:translateX(-50%) rotate(-12deg)}100%{transform:translateX(-50%) rotate(12deg)}}' +
+        '@keyframes rgPop{0%{transform:scale(0.6)}100%{transform:scale(1.15)}}' +
+        '.pr-pc{width:100%;margin-top:0.4rem;display:none}' +
+        '.pr-pc.show{display:block}' +
+        '.pr-pt{background:#1e293b;height:5px;border-radius:20px;overflow:hidden}' +
+        '.pr-pf{width:0%;height:100%;background:linear-gradient(90deg,#c9a96e,#e0c88e);border-radius:20px;transition:width 0.05s linear}' +
+        '.pr-pm{display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem;font-size:0.75rem}' +
+        '.pr-pm span:first-child{color:#8191aa;text-transform:uppercase;letter-spacing:0.8px;font-weight:600}' +
+        '.pr-pm span:last-child{color:#b9c7dd;font-weight:600}' +
+        '@media(max-width:768px){.rg-card{padding:1.2rem 1rem;max-width:300px}.rg-card h2{font-size:1.2rem}.rg-img img{max-height:150px}}' +
+    '</style>' +
+    '<div class="imm-scene-wrap" id="immersiveSceneContainer"></div>' +
+    '<div class="imm-hud" id="immHudDesktop">Haz clic para mirar &nbsp;|&nbsp; <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas para caminar &nbsp;|&nbsp; Busca el regalo al final</div>' +
+    '<div class="imm-hud" id="immHudMobile" style="display:none">Arrastra el joystick para caminar &nbsp;|&nbsp; Toca fuera para mirar &nbsp;|&nbsp; Busca el regalo al final</div>' +
+    '<div class="rg-over" id="regaloOverlay">' +
+        '<div class="rg-card">' +
+            '<h2>Un regalo de agradecimiento</h2>' +
+            '<p class="rg-sub">Gracias por visitar mi exposici\u00f3n. Recibe este obsequio con gratitud.</p>' +
+            '<div class="rg-img"><img src="/static/images/regalo.jpeg" alt="Regalo de agradecimiento"></div>' +
+            '<div class="rg-btns" id="regaloBtns">' +
+                '<button class="rg-dl" id="regaloBtnDownload">Descargar Regalo</button>' +
+                '<button class="rg-cl" id="regaloBtnClose">Cerrar</button>' +
+            '</div>' +
+            '<div class="pr-stage" id="parachuteStage">' +
+                '<div class="pr-sky">' +
+                    '<div class="pr-w" id="parachuteWidget">' +
+                        '<svg viewBox="0 0 100 100"><g class="pr-l"><line x1="50" y1="54" x2="18" y2="36"/><line x1="50" y1="54" x2="35" y2="28"/><line x1="50" y1="54" x2="65" y2="28"/><line x1="50" y1="54" x2="82" y2="36"/></g><path class="pr-c" d="M18,36 C18,8 82,8 82,36 C70,30 60,36 50,30 C40,36 30,30 18,36 Z"/><g class="pr-a"><line x1="50" y1="46" x2="50" y2="74" stroke-width="7" stroke-linecap="round"/><polygon points="50,85 35,65 65,65"/></g><path class="pr-ck" d="M28,52 L44,68 L74,36"/></svg>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="pr-pc" id="regaloProgressContainer">' +
+                    '<div class="pr-pt"><div class="pr-pf" id="regaloProgressFill"></div></div>' +
+                    '<div class="pr-pm"><span id="regaloStatusLabel">Preparando...</span><span id="regaloPercentText">0%</span></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+    '</div>' +
+    '<button class="imm-ex" data-action="exit-immersive" aria-label="Salir">✕</button>';
+
+    if (this._immersiveLoadId !== loadId) return;
+
+    var self = this;
+    var container = document.getElementById('immersiveSceneContainer');
+    this._immersiveArts = arts;
+
+    var loaded = 0;
+    var total = arts.length;
+    if (total === 0) {
+        self._startImmersive(container, arts, invitadosData, loadId);
+    } else {
+        arts.forEach(function(a) {
+            var i = new Image();
+            i.onload = function() { loaded++; if (loaded === total) { self._startImmersive(container, arts, invitadosData, loadId); } };
+            i.onerror = function() { loaded++; if (loaded === total) { self._startImmersive(container, arts, invitadosData, loadId); } };
+            i.src = a.image;
+        });
+    }
+
+    var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    var hudDesktop = document.getElementById('immHudDesktop');
+    var hudMobile = document.getElementById('immHudMobile');
+    if (isMobile) {
+        if (hudDesktop) hudDesktop.style.display = 'none';
+        if (hudMobile) hudMobile.style.display = 'block';
+    }
+
+    this._igCleanup = function() {
+        if (self.immersiveScene) {
+            self.immersiveScene.dispose();
+            self.immersiveScene = null;
+        }
+    };
+
+    this.attachEventListeners();
+
+    if (document.getElementById('regaloBtnClose')) {
+        document.getElementById('regaloBtnClose').addEventListener('click', function() {
+            document.getElementById('regaloOverlay').classList.remove('activo');
+        });
+    }
+
+    if (document.getElementById('regaloBtnDownload')) {
+        document.getElementById('regaloBtnDownload').addEventListener('click', function() {
+            var parachuteStage = document.getElementById('parachuteStage');
+            var parachuteWidget = document.getElementById('parachuteWidget');
+            var progressFill = document.getElementById('regaloProgressFill');
+            var percentText = document.getElementById('regaloPercentText');
+            var statusLabel = document.getElementById('regaloStatusLabel');
+            var progressContainer = document.getElementById('regaloProgressContainer');
+            var regaloBtns = document.getElementById('regaloBtns');
+
+            regaloBtns.style.display = 'none';
+            parachuteStage.classList.add('show');
+            progressContainer.classList.add('show');
+            parachuteWidget.classList.remove('rising', 'falling', 'success');
+            progressFill.style.width = '0%'; percentText.textContent = '0%';
+            statusLabel.textContent = 'Preparando...'; statusLabel.style.color = '#8191aa';
+            void parachuteWidget.offsetWidth;
+
+            parachuteWidget.classList.add('rising');
+
+            setTimeout(function() {
+                parachuteWidget.classList.remove('rising');
+                parachuteWidget.classList.add('falling');
+                statusLabel.textContent = 'Descargando...';
+                var progress = 0;
+                var animDuration = 3800, intervalStep = 45;
+                var increment = 100 / (animDuration / intervalStep);
+                var progressInterval = setInterval(function() {
+                    progress += increment;
+                    if (progress >= 100) {
+                        progress = 100; clearInterval(progressInterval);
+                        progressFill.style.width = '100%'; percentText.textContent = '100%';
+                        setTimeout(function() {
+                            parachuteWidget.classList.remove('falling');
+                            parachuteWidget.classList.add('success');
+                            statusLabel.textContent = 'Completado'; statusLabel.style.color = '#00e676';
+                            window._galeriaRegaloEntregado = true;
+                            if (self.immersiveScene && self.immersiveScene.hideGiftPanel) {
+                                self.immersiveScene.hideGiftPanel();
+                            }
+                            var a = document.createElement('a');
+                            a.href = '/static/images/regalo.jpeg';
+                            a.download = 'regalo-daniel-guido.jpeg';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setTimeout(function() {
+                                parachuteWidget.classList.remove('success');
+                                document.getElementById('regaloOverlay').classList.remove('activo');
+                                regaloBtns.style.display = 'flex';
+                                parachuteStage.classList.remove('show');
+                                progressContainer.classList.remove('show');
+                                progressFill.style.width = '0%';
+                                percentText.textContent = '0%';
+                            }, 2000);
+                        }, 80);
+                    } else {
+                        progressFill.style.width = progress + '%';
+                        percentText.textContent = Math.floor(progress) + '%';
+                    }
+                }, intervalStep);
+            }, 700);
+        });
+    }
+}
+
+_startImmersive(container, arts, invitadosData, loadId) {
+    if (this._immersiveLoadId !== loadId) return;
+    var app = this;
+    this.immersiveScene = new ImmersiveScene(container, arts, invitadosData);
+    this._igCleanup = function() {
+        if (app.immersiveScene) {
+            app.immersiveScene.dispose();
+            app.immersiveScene = null;
+        }
+    };
+}
+
+_initCanvasImmersiveGallery() {}
 }
  
 // INICIALIZACIÓN 

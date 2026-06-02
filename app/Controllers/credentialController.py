@@ -1,14 +1,16 @@
 
 from flask import Blueprint, request, jsonify,session,url_for
-from app.extensions import db
+from app.extensions import db, limiter
 from app.Services import email_service
 from app.Models.login import Login
+from app.Models.user import Usuario
 import bcrypt
 import random
 
 credential_bp = Blueprint("crede", __name__, url_prefix='/crede')
 
 @credential_bp.route('/validar_usuario', methods=['POST'])
+@limiter.limit("5 per minute")
 def ValidarUsuarioRecovery():
     try:
         data = request.get_json()
@@ -26,12 +28,7 @@ def ValidarUsuarioRecovery():
                 'message': 'El correo no está asociado a ninguna cuenta.'
             })
 
-        #   valida el estado
-        if login.estado != 1 :
-            return jsonify({
-                'success': False,
-                'message': 'Usuario bloqueado. Solo puede recuperar contraseña.'
-            })
+       
 
         #   Ggenra el codigo
         code = random.randint(100000, 999999)
@@ -44,7 +41,7 @@ def ValidarUsuarioRecovery():
         
 
         #   envia el correo
-        #email_service.SendVerificationCode(email=correo, code=code)
+        email_service.SendVerificationCode(email=correo, code=code)
 
         return jsonify({
             'success': True,
@@ -57,6 +54,7 @@ def ValidarUsuarioRecovery():
 
     
 @credential_bp.route('/validate_code', methods=['POST'])
+@limiter.limit("5 per minute")
 def ValidateCode():
     try:
         data = request.get_json()
@@ -92,6 +90,7 @@ def ValidateCode():
 
 
 @credential_bp.route('/update_password', methods=['POST'])
+@limiter.limit("5 per minute")
 def UpdatePassword():
     try:
         
@@ -106,7 +105,7 @@ def UpdatePassword():
 
         idusuario = session.get('recovery_idusuario')
 
-        login = Login.query.filter_by(idusuario=idusuario).first()
+        login = Usuario.query.filter_by(idusuario=idusuario).first()
         if not login:
             return jsonify({'success': False, 'message': 'Usuario no encontrado'})
 

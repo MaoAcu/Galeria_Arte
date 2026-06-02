@@ -2,6 +2,7 @@
 from .user import Usuario
 from .login import Login
 from .escultura import Escultura
+from .artistaInvitado import ArtistaInvitado
  
 
 
