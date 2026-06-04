@@ -277,6 +277,32 @@
                         </div>
                         <small>Opcional · Formatos: JPG, PNG, WEBP</small>
                     </div>
+
+                    <div class="form-group">
+                        <label>Audio / Narración de la Obra</label>
+                        <div class="audio-upload-container">
+                            <input type="file" id="sculptureAudioFile" name="audio" accept=".mp3,.wav,.ogg,.m4a,.aac,.webm" style="display: none;">
+                            <div class="audio-preview" id="audioPreview" style="display:none">
+                                <audio id="audioPlayer" controls style="width:100%;max-width:300px;border-radius:8px"></audio>
+                            </div>
+                            <div class="audio-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                                <button type="button" class="btn-audio-upload" id="btnAudioUpload" onclick="document.getElementById('sculptureAudioFile').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i> Subir audio
+                                </button>
+                                <button type="button" class="btn-audio-record" id="btnAudioRecord" onclick="toggleRecording()">
+                                    <i class="fas fa-microphone"></i> Grabar
+                                </button>
+                                <button type="button" class="btn-audio-delete" id="btnAudioDelete" style="display:none;background:rgba(205,92,92,0.15);color:#ef4444;border:1px solid rgba(205,92,92,0.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem" onclick="removeAudio()">
+                                    <i class="fas fa-trash"></i> Quitar
+                                </button>
+                                <span id="recordingStatus" style="color:#ef4444;font-size:0.75rem;display:none">
+                                    <i class="fas fa-circle" style="animation:blink 1s infinite"></i> Grabando...
+                                </span>
+                                <span id="audioFileName" class="file-name" style="color:#8b949e"></span>
+                            </div>
+                        </div>
+                        <small>Formatos: MP3, WAV, OGG, M4A, AAC · Narración que se reproduce al acercarse a la obra</small>
+                    </div>
                     
                     <div class="form-group">
                         <label for="sculptureStatus">Estado</label>

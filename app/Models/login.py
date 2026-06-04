@@ -17,6 +17,7 @@ class Login(db.Model):
     estado = Column(Integer, default=1)
     intentos = Column(Integer, default=0)
     codigo = Column(Integer)
+    codigo_expiracion = Column(DateTime)
     local = Column(Integer)
 
     def verificar_password(self, password_plano):

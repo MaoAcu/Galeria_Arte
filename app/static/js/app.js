@@ -682,6 +682,9 @@ class App {
                                 Hecho con el ❤️ por <a href="https://logiclookcr.com" target="_blank" rel="noopener noreferrer">Logic Look</a>
                             </span>
                         </p>
+                        <p style="font-size:0.7rem;margin-top:4px;color:rgba(255,255,255,0.35)">
+                            Música de fondo: Gymnopedie No. 1 por Kevin MacLeod (Licencia CC BY 4.0)
+                        </p>
                     </div>
                 </div>
             </footer>
@@ -812,6 +815,9 @@ class App {
                                 Hecho con el ❤️ por <a href="https://logiclookcr.com" target="_blank" rel="noopener noreferrer">Logic Look</a>
                             </span>
                         </p>
+                        <p style="font-size:0.7rem;margin-top:4px;color:rgba(255,255,255,0.35)">
+                            Música de fondo: Gymnopedie No. 1 por Kevin MacLeod (Licencia CC BY 4.0)
+                        </p>
                     </div>
                 </div>
             </footer>
@@ -847,6 +853,9 @@ async renderImmersiveExperience() {
         var url = item.image
             ? (item.image.startsWith('http://') || item.image.startsWith('https://') ? item.image : URL_GALLERY + '/' + item.image)
             : URL_GALLERY + '/placeholder.jpg';
+        var audioUrl = item.audio
+            ? (item.audio.startsWith('http://') || item.audio.startsWith('https://') ? item.audio : URL_AUDIO + '/' + item.audio)
+            : null;
         return {
             id: item.id,
             title: item.title,
@@ -855,6 +864,7 @@ async renderImmersiveExperience() {
             material: item.material,
             description: item.description,
             image: url,
+            audio: audioUrl,
             width: item.width || 800,
             height: item.height || 600,
             imgEl: null
@@ -908,7 +918,16 @@ async renderImmersiveExperience() {
         '.pr-pm span:first-child{color:#8191aa;text-transform:uppercase;letter-spacing:0.8px;font-weight:600}' +
         '.pr-pm span:last-child{color:#b9c7dd;font-weight:600}' +
         '@media(max-width:768px){.rg-card{padding:1.2rem 1rem;max-width:300px}.rg-card h2{font-size:1.2rem}.rg-img img{max-height:150px}}' +
+        '@media(orientation:landscape) and (max-height:500px){.rg-card{max-height:95vh;overflow-y:auto;padding:0.8rem 1rem;max-width:280px}.rg-card h2{font-size:1rem;margin-bottom:0.1rem}.rg-sub{font-size:0.7rem;margin-bottom:0.5rem}.rg-img img{max-height:80px}.rg-btns{gap:6px}.rg-dl,.rg-cl{font-size:0.8rem;padding:0.55rem 0.8rem}.pr-sky{height:70px}.pr-w{width:30px;height:30px;bottom:20px}.pr-w.rising{animation-name:rgShootUpSm}.pr-w.falling{animation-name:rgFloatDownSm,rgSwaySm}@keyframes rgShootUpSm{0%{bottom:20px;transform:translateX(-50%) scale(1);opacity:1}85%{opacity:0.9}100%{bottom:58px;transform:translateX(-50%) scale(0.7);opacity:0}}@keyframes rgFloatDownSm{0%{bottom:58px}100%{bottom:20px}}@keyframes rgSwaySm{0%{transform:translateX(-50%) rotate(-10deg)}100%{transform:translateX(-50%) rotate(10deg)}}@keyframes rgPopSm{0%{transform:scale(0.5)}100%{transform:scale(1.05)}}.pr-w.success .pr-ck{animation-name:rgPopSm}.pr-pm{font-size:0.6rem;margin-top:0.15rem}.pr-pc{margin-top:0.15rem}.pr-pt{height:3px}}' +
+        '#rotarMsgWrap{position:fixed;top:0;left:0;width:100%;height:100%;z-index:300;background:rgba(0,0,0,0.88);display:none;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;pointer-events:all}' +
+        '#rotarMsgWrap.show{display:flex}' +
+        '#rotarMsgIcon{font-size:3rem;margin-bottom:1rem}' +
+        '#rotarMsgTitle{color:#c9a96e;font-size:1.3rem;font-weight:600;margin-bottom:0.4rem}' +
+        '#rotarMsgSub{color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:1.2rem}' +
+        '#rotarMsgBtn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:10px 24px;border-radius:2rem;font-size:0.85rem;cursor:pointer;transition:all 0.3s}' +
+        '#rotarMsgBtn:hover{background:rgba(255,255,255,0.15);color:#fff}' +
     '</style>' +
+    '<div id="rotarMsgWrap"><div id="rotarMsgIcon">📱</div><div id="rotarMsgTitle">Gira tu teléfono</div><div id="rotarMsgSub">La experiencia inmersiva se disfruta mejor en horizontal</div><button id="rotarMsgBtn">Entendido</button></div>' +
     '<div class="imm-scene-wrap" id="immersiveSceneContainer"></div>' +
     '<div class="imm-hud" id="immHudDesktop">Haz clic para mirar &nbsp;|&nbsp; <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas para caminar &nbsp;|&nbsp; Busca el regalo al final</div>' +
     '<div class="imm-hud" id="immHudMobile" style="display:none">Arrastra el joystick para caminar &nbsp;|&nbsp; Toca fuera para mirar &nbsp;|&nbsp; Busca el regalo al final</div>' +
@@ -960,7 +979,46 @@ async renderImmersiveExperience() {
     var hudMobile = document.getElementById('immHudMobile');
     if (isMobile) {
         if (hudDesktop) hudDesktop.style.display = 'none';
-        if (hudMobile) hudMobile.style.display = 'block';
+
+        var hudTimer = null;
+        function showHud() {
+            if (!hudMobile) return;
+            hudMobile.style.display = 'block';
+            hudMobile.style.transition = 'none';
+            hudMobile.style.opacity = '1';
+            if (hudTimer) clearTimeout(hudTimer);
+            hudTimer = setTimeout(function() {
+                if (hudMobile) { hudMobile.style.transition = 'opacity 1.2s ease'; hudMobile.style.opacity = '0'; }
+            }, 5000);
+        }
+
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(function() {});
+        }
+
+        function checkOrientation() {
+            var rw = document.getElementById('rotarMsgWrap');
+            if (!rw) return;
+            var ro = document.getElementById('regaloOverlay');
+            if (ro && ro.classList.contains('activo')) return;
+            if (window.innerHeight > window.innerWidth) {
+                rw.classList.add('show');
+            } else {
+                rw.classList.remove('show');
+                showHud();
+            }
+        }
+        checkOrientation();
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', function() { setTimeout(checkOrientation, 200); });
+
+        var rotarBtn = document.getElementById('rotarMsgBtn');
+        if (rotarBtn) {
+            rotarBtn.addEventListener('click', function() {
+                document.getElementById('rotarMsgWrap').classList.remove('show');
+                showHud();
+            });
+        }
     }
 
     this._igCleanup = function() {
@@ -968,6 +1026,12 @@ async renderImmersiveExperience() {
             self.immersiveScene.dispose();
             self.immersiveScene = null;
         }
+        var rw = document.getElementById('rotarMsgWrap');
+        if (rw && rw.parentNode) rw.parentNode.removeChild(rw);
+        var hd = document.getElementById('immHudDesktop');
+        if (hd && hd.parentNode) hd.parentNode.removeChild(hd);
+        var hm = document.getElementById('immHudMobile');
+        if (hm && hm.parentNode) hm.parentNode.removeChild(hm);
     };
 
     this.attachEventListeners();
@@ -1053,6 +1117,12 @@ _startImmersive(container, arts, invitadosData, loadId) {
             app.immersiveScene.dispose();
             app.immersiveScene = null;
         }
+        var rw = document.getElementById('rotarMsgWrap');
+        if (rw && rw.parentNode) rw.parentNode.removeChild(rw);
+        var hd = document.getElementById('immHudDesktop');
+        if (hd && hd.parentNode) hd.parentNode.removeChild(hd);
+        var hm = document.getElementById('immHudMobile');
+        if (hm && hm.parentNode) hm.parentNode.removeChild(hm);
     };
 }
 

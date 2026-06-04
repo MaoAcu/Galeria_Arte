@@ -21,3 +21,4 @@ class Escultura(db.Model):
     estado = Column(Integer, default=1)   
     created_at = Column(db.DateTime, default=datetime.utcnow)
     updated_at = Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+     

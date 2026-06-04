@@ -11,11 +11,15 @@ from PIL import Image
 # Configuración de upload
 UPLOAD_FOLDER = os.path.join('app', 'static', 'gallery')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-
+AUDIO_ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg', 'm4a', 'aac', 'webm', 'weba'}
+AUDIO_UPLOAD_FOLDER = os.path.join('app', 'static', 'audio')
 escultura_bp = Blueprint("escultura", __name__, url_prefix='/escultura')
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def allowed_audio_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in AUDIO_ALLOWED_EXTENSIONS
 
 def optimizar_imagen(input_path, output_filename):
     """Optimizar imagen manteniendo calidad original"""
@@ -134,6 +138,7 @@ def CreateEscultura():
     try:
         data = request.form
         file = request.files.get('image')
+        audio_file = request.files.get('audio')
         
         if not data.get("title") or not data.get("artist") or not data.get("year") or not data.get("material") or not data.get("description"):
             return jsonify({"error": "title, artist, year, material y description son obligatorios"}), 400
@@ -152,6 +157,17 @@ def CreateEscultura():
 
             filename = optimizar_imagen(temp_path, filename)
 
+        audio_filename = None
+        if audio_file and allowed_audio_file(audio_file.filename):
+            ext = audio_file.filename.rsplit('.', 1)[1].lower()
+            audio_filename = f"{uuid.uuid4().hex}.{ext}"
+            audio_upload_path = os.path.join(current_app.root_path, "static", "audio")
+            os.makedirs(audio_upload_path, exist_ok=True)
+            audio_path = os.path.join(audio_upload_path, audio_filename)
+            audio_file.save(audio_path)
+        elif data.get('audio'):
+            audio_filename = data.get('audio')
+
         escultura = Escultura(
             title=data.get('title'),
             artist=data.get('artist'),
@@ -162,7 +178,7 @@ def CreateEscultura():
             alt=data.get('alt', data.get('title')),
             width=int(data.get('width', 800)),
             height=int(data.get('height', 600)),
-            audio=data.get('audio'),
+            audio=audio_filename,
             orden=int(data.get('orden', 0)),
             estado=int(data.get('estado', 1))
         )
@@ -188,6 +204,7 @@ def UpdateEscultura(id):
 
         data = request.form
         file = request.files.get("image")
+        audio_file = request.files.get("audio")
         
         # Procesar nueva imagen si se subió
         if file and allowed_file(file.filename):
@@ -211,6 +228,24 @@ def UpdateEscultura(id):
             
             escultura.image = filename
 
+        if audio_file and allowed_audio_file(audio_file.filename):
+            ext = audio_file.filename.rsplit('.', 1)[1].lower()
+            audio_filename = f"{uuid.uuid4().hex}.{ext}"
+            audio_upload_path = os.path.join(current_app.root_path, "static", "audio")
+            os.makedirs(audio_upload_path, exist_ok=True)
+            audio_path = os.path.join(audio_upload_path, audio_filename)
+            audio_file.save(audio_path)
+
+            if escultura.audio:
+                old_audio_path = os.path.join(audio_upload_path, escultura.audio)
+                if os.path.exists(old_audio_path):
+                    try:
+                        os.remove(old_audio_path)
+                    except Exception as e:
+                        print(f"⚠️ Error eliminando audio anterior: {e}")
+
+            escultura.audio = audio_filename
+
         # Campos editables
         campos = {
             "title": data.get("title"),
@@ -221,10 +256,11 @@ def UpdateEscultura(id):
             "alt": data.get("alt"),
             "width": data.get("width"),
             "height": data.get("height"),
-            "audio": data.get("audio"),
             "orden": data.get("orden"),
             "estado": data.get("estado")
         }
+        if not audio_file:
+            campos["audio"] = data.get("audio")
 
         for campo, valor in campos.items():
             if valor is not None:
@@ -261,6 +297,15 @@ def DeleteEscultura(id):
                     print(f"Imagen eliminada: {escultura.image}")
                 except Exception as e:
                     print(f"Error eliminando imagen: {e}")
+
+        if escultura.audio:
+            audio_path = os.path.join(current_app.root_path, "static", "audio", escultura.audio)
+            if os.path.exists(audio_path):
+                try:
+                    os.remove(audio_path)
+                    print(f"Audio eliminado: {escultura.audio}")
+                except Exception as e:
+                    print(f"Error eliminando audio: {e}")
 
         db.session.delete(escultura)
         db.session.commit()
@@ -328,6 +373,7 @@ def CreateInvitado():
         data = request.form
         file = request.files.get('image')
         artistFile = request.files.get('artist_image')
+        audio_file = request.files.get('audio')
 
         if not data.get("title") or not data.get("artist") or not data.get("year") or not data.get("material") or not data.get("description"):
             return jsonify({"error": "title, artist, year, material y description son obligatorios"}), 400
@@ -352,6 +398,17 @@ def CreateInvitado():
             artistFile.save(temp_path)
             artistFilename = optimizar_imagen(temp_path, artistFilename)
 
+        audio_filename = None
+        if audio_file and allowed_audio_file(audio_file.filename):
+            ext = audio_file.filename.rsplit('.', 1)[1].lower()
+            audio_filename = f"{uuid.uuid4().hex}.{ext}"
+            audio_upload_path = os.path.join(current_app.root_path, "static", "audio")
+            os.makedirs(audio_upload_path, exist_ok=True)
+            audio_path = os.path.join(audio_upload_path, audio_filename)
+            audio_file.save(audio_path)
+        elif data.get('audio'):
+            audio_filename = data.get('audio')
+
         invitado = ArtistaInvitado(
             title=data.get('title'),
             artist=data.get('artist'),
@@ -364,7 +421,7 @@ def CreateInvitado():
             alt=data.get('alt', data.get('title')),
             width=int(data.get('width', 800)),
             height=int(data.get('height', 600)),
-            audio=data.get('audio'),
+            audio=audio_filename,
             orden=int(data.get('orden', 0)),
             estado=int(data.get('estado', 1))
         )
@@ -392,6 +449,7 @@ def UpdateInvitado(id):
         data = request.form
         file = request.files.get("image")
         artistFile = request.files.get("artist_image")
+        audio_file = request.files.get("audio")
 
         if file and allowed_file(file.filename):
             ext = file.filename.rsplit('.', 1)[1].lower()
@@ -427,6 +485,22 @@ def UpdateInvitado(id):
 
             invitado.artist_image = artistFilename
 
+        if audio_file and allowed_audio_file(audio_file.filename):
+            ext = audio_file.filename.rsplit('.', 1)[1].lower()
+            audio_filename = f"{uuid.uuid4().hex}.{ext}"
+            audio_upload_path = os.path.join(current_app.root_path, "static", "audio")
+            os.makedirs(audio_upload_path, exist_ok=True)
+            audio_path = os.path.join(audio_upload_path, audio_filename)
+            audio_file.save(audio_path)
+
+            if invitado.audio:
+                old_audio_path = os.path.join(audio_upload_path, invitado.audio)
+                if os.path.exists(old_audio_path):
+                    try: os.remove(old_audio_path)
+                    except Exception as e: print(f"Error eliminando audio anterior: {e}")
+
+            invitado.audio = audio_filename
+
         campos = {
             "title": data.get("title"),
             "artist": data.get("artist"),
@@ -438,10 +512,11 @@ def UpdateInvitado(id):
             "alt": data.get("alt"),
             "width": data.get("width"),
             "height": data.get("height"),
-            "audio": data.get("audio"),
             "orden": data.get("orden"),
             "estado": data.get("estado")
         }
+        if not audio_file:
+            campos["audio"] = data.get("audio")
 
         for campo, valor in campos.items():
             if valor is not None:
@@ -476,6 +551,14 @@ def DeleteInvitado(id):
                     os.remove(image_path)
                 except Exception as e:
                     print(f"Error eliminando imagen: {e}")
+
+        if invitado.audio:
+            audio_path = os.path.join(current_app.root_path, "static", "audio", invitado.audio)
+            if os.path.exists(audio_path):
+                try:
+                    os.remove(audio_path)
+                except Exception as e:
+                    print(f"Error eliminando audio: {e}")
 
         db.session.delete(invitado)
         db.session.commit()

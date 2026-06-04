@@ -1,5 +1,6 @@
 // ===== CONFIGURACIÓN =====
 const URL_IMG_BASE = "/static/gallery/";
+const URL_AUDIO_BASE = "/static/audio/";
 const URL_IMG_DEFAULT = "https://via.placeholder.com/400x300?text=Sin+Imagen";
 const API_BASE = "/escultura";
 
@@ -20,6 +21,10 @@ let editingInvitado = null;
 let deleteCallback = null;
 let selectedImageFile = null;
 let selectedInvImageFile = null;
+let selectedAudioFile = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
 
 // ===== API =====
 async function apiGet(url) {
@@ -57,6 +62,7 @@ async function loadData() {
             material: e.material,
             descripcion: e.description,
             imagen: e.image ? (e.image.startsWith('http') ? e.image : URL_IMG_BASE + e.image) : URL_IMG_DEFAULT,
+            audio: e.audio || null,
             coleccion: 'serie-guardiana',
             destacada: 0,
             estado: e.estado === 1 ? 'active' : 'inactive',
@@ -72,6 +78,7 @@ async function loadData() {
             material: a.material,
             descripcion: a.description,
             imagen: a.image ? (a.image.startsWith('http') ? a.image : URL_IMG_BASE + a.image) : null,
+            audio: a.audio || null,
             estado: a.estado === 1 ? 'active' : 'inactive',
             orden: a.orden
         }));
@@ -273,16 +280,24 @@ function openItemModal(id = null, coleccionDefault = null) {
 
     actualizarEstrellaSimple(editingItem?.destacada || 0);
     resetImageUpload();
+    resetAudioUpload();
     document.querySelector('label[for="sculptureImageFile"]').textContent = 'Imagen de la Obra';
     document.getElementById('artistImageUpload').style.display = 'none';
     if (editingItem?.imagen && editingItem.imagen !== URL_IMG_DEFAULT) {
         const preview = document.querySelector('#imagePreview img');
         if (preview) { preview.src = editingItem.imagen; preview.style.display = 'block'; }
     }
+    if (editingItem?.audio) {
+        document.getElementById('audioFileName').textContent = editingItem.audio;
+        document.getElementById('btnAudioDelete').style.display = 'inline-flex';
+        document.getElementById('btnAudioRecord').style.display = 'none';
+        var audioUrl = editingItem.audio.startsWith('http') ? editingItem.audio : '/static/audio/' + editingItem.audio;
+        showAudioPreview(audioUrl);
+    }
     document.getElementById('editModal').classList.add('active');
 }
 
-function closeItemModal() { document.getElementById('editModal').classList.remove('active'); editingItem = null; editingInvitado = null; selectedImageFile = null; }
+function closeItemModal() { document.getElementById('editModal').classList.remove('active'); editingItem = null; editingInvitado = null; selectedImageFile = null; resetAudioUpload(); }
 
 function resetImageUpload() {
     selectedImageFile = null;
@@ -302,6 +317,21 @@ function resetInvImageUpload() {
     if (preview) { preview.src = ''; preview.style.display = 'none'; }
 }
 
+function resetAudioUpload() {
+    if (isRecording) stopRecording();
+    selectedAudioFile = null;
+    document.getElementById('sculptureAudioFile').value = '';
+    document.getElementById('audioFileName').textContent = '';
+    document.getElementById('btnAudioDelete').style.display = 'none';
+    document.getElementById('btnAudioRecord').style.display = 'inline-flex';
+    document.getElementById('btnAudioRecord').classList.remove('recording');
+    document.getElementById('btnAudioRecord').innerHTML = '<i class="fas fa-microphone"></i> Grabar';
+    document.getElementById('btnAudioUpload').style.display = 'inline-flex';
+    document.getElementById('recordingStatus').style.display = 'none';
+    document.getElementById('audioPreview').style.display = 'none';
+    document.getElementById('audioPlayer').src = '';
+}
+
 function handleInvImageSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -314,6 +344,82 @@ function handleInvImageSelect(event) {
         if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
     };
     reader.readAsDataURL(file);
+}
+
+function handleAudioSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    selectedAudioFile = file;
+    document.getElementById('audioFileName').textContent = file.name;
+    document.getElementById('btnAudioDelete').style.display = 'inline-flex';
+    document.getElementById('btnAudioRecord').style.display = 'none';
+    const audioUrl = URL.createObjectURL(file);
+    showAudioPreview(audioUrl);
+}
+
+function showAudioPreview(url) {
+    const preview = document.getElementById('audioPreview');
+    const player = document.getElementById('audioPlayer');
+    if (preview && player) {
+        preview.style.display = 'block';
+        player.src = url;
+        player.load();
+    }
+}
+
+function removeAudio() {
+    selectedAudioFile = null;
+    document.getElementById('sculptureAudioFile').value = '';
+    document.getElementById('audioFileName').textContent = '';
+    document.getElementById('btnAudioDelete').style.display = 'none';
+    document.getElementById('btnAudioRecord').style.display = 'inline-flex';
+    document.getElementById('audioPreview').style.display = 'none';
+    document.getElementById('audioPlayer').src = '';
+}
+
+async function toggleRecording() {
+    if (isRecording) {
+        stopRecording();
+        return;
+    }
+    startRecording();
+}
+
+async function startRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+            selectedAudioFile = new File([blob], 'grabacion_' + Date.now() + '.webm', { type: mediaRecorder.mimeType });
+            document.getElementById('audioFileName').textContent = selectedAudioFile.name;
+            document.getElementById('btnAudioDelete').style.display = 'inline-flex';
+            document.getElementById('recordingStatus').style.display = 'none';
+            document.getElementById('btnAudioRecord').classList.remove('recording');
+            document.getElementById('btnAudioRecord').innerHTML = '<i class="fas fa-microphone"></i> Grabar';
+            document.getElementById('btnAudioUpload').style.display = 'inline-flex';
+            const audioUrl = URL.createObjectURL(blob);
+            showAudioPreview(audioUrl);
+            stream.getTracks().forEach(t => t.stop());
+        };
+        mediaRecorder.start();
+        isRecording = true;
+        document.getElementById('recordingStatus').style.display = 'inline';
+        document.getElementById('btnAudioRecord').classList.add('recording');
+        document.getElementById('btnAudioRecord').innerHTML = '<i class="fas fa-stop"></i> Detener';
+        document.getElementById('btnAudioUpload').style.display = 'none';
+    } catch(e) {
+        showInfoModal('Error', 'No se pudo acceder al micrófono. Verifica los permisos.', 'exclamation-triangle');
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        isRecording = false;
+    }
 }
 
 function handleImageSelect(event) {
@@ -364,6 +470,7 @@ async function saveItem(e) {
     formData.append('estado', estado === 'active' ? '1' : '0');
     formData.append('orden', id ? (esculturas.find(e => e.id === parseInt(id))?.orden || 0) : esculturas.length);
     if (selectedImageFile) formData.append('image', selectedImageFile);
+    if (selectedAudioFile) formData.append('audio', selectedAudioFile);
 
     showLoader();
     try {
@@ -470,6 +577,7 @@ function openInvitadoModal(id = null) {
 
     resetImageUpload();
     resetInvImageUpload();
+    resetAudioUpload();
     if (editingInvitado?.imagen) {
         const preview = document.querySelector('#imagePreview img');
         if (preview) { preview.src = editingInvitado.imagen; preview.style.display = 'block'; }
@@ -481,6 +589,14 @@ function openInvitadoModal(id = null) {
 
     document.querySelector('label[for="sculptureImageFile"]').textContent = 'Imagen de la Obra';
     document.getElementById('artistImageUpload').style.display = 'block';
+
+    if (editingInvitado?.audio) {
+        document.getElementById('audioFileName').textContent = editingInvitado.audio;
+        document.getElementById('btnAudioDelete').style.display = 'inline-flex';
+        document.getElementById('btnAudioRecord').style.display = 'none';
+        var invAudioUrl = editingInvitado.audio.startsWith('http') ? editingInvitado.audio : '/static/audio/' + editingInvitado.audio;
+        showAudioPreview(invAudioUrl);
+    }
 
     document.getElementById('editModal').classList.add('active');
 }
@@ -507,6 +623,7 @@ async function saveInvitado(e) {
     formData.append('orden', invitados.length);
     if (selectedImageFile) formData.append('image', selectedImageFile);
     if (selectedInvImageFile) formData.append('artist_image', selectedInvImageFile);
+    if (selectedAudioFile) formData.append('audio', selectedAudioFile);
 
     showLoader();
     try {
@@ -623,6 +740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('sculptureImageFile').addEventListener('change', handleImageSelect);
     document.getElementById('artistImageFile').addEventListener('change', handleInvImageSelect);
+    document.getElementById('sculptureAudioFile').addEventListener('change', handleAudioSelect);
 
     document.getElementById('sculptureForm').addEventListener('submit', (e) => {
         if (editingInvitado !== null || currentSection === 'invitados') {
@@ -669,3 +787,5 @@ window.closeDeleteModal = closeDeleteModal;
 window.closeInfoModal = closeInfoModal;
 window.switchSection = switchSection;
 window.handleImageSelect = handleImageSelect;
+window.toggleRecording = toggleRecording;
+window.removeAudio = removeAudio;

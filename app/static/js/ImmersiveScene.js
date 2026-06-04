@@ -16,6 +16,7 @@ function I(container, sculptures, invitadosData) {
     this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     this.giftMeshes = [];
     this.invitedMeshes = [];
+    this.audioSlots = [];
 
     var len = sculptures.length * 6 + 12;
     this.config = {
@@ -139,6 +140,13 @@ I.prototype = {
         this.createCeiling();
         this.loadSculptures();
         this.createInvitedCorridor();
+
+        var bgMusic = document.createElement('audio');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.12;
+        bgMusic.src = URL_AUDIO + '/GymnopedieNo.1.mp3';
+        bgMusic.play().catch(function(){});
+        this._bgMusic = bgMusic;
 
         this._boundAnimate = function() { self.animate(); };
         this.animId = requestAnimationFrame(this._boundAnimate);
@@ -383,25 +391,51 @@ I.prototype = {
 
             if (art.title) {
                 var tc = document.createElement('canvas');
-                tc.width = 512; tc.height = 80;
+                tc.width = 768; tc.height = 96;
                 var tx = tc.getContext('2d');
                 tx.fillStyle = '#111111'; tx.fillRect(0, 0, tc.width, tc.height);
                 tx.fillStyle = '#d4b85f';
-                tx.font = 'bold 28px Georgia, serif';
                 tx.textAlign = 'center'; tx.textBaseline = 'middle';
-                var tt = art.title.length > 15 ? art.title.substring(0, 13) + '...' : art.title;
-                tx.fillText(tt, tc.width / 2, tc.height / 2);
+                var fontSize = 30;
+                tx.font = 'bold ' + fontSize + 'px Georgia, serif';
+                var maxTextW = tc.width - 40;
+                var txt = art.title;
+                while (tx.measureText(txt).width > maxTextW && fontSize > 16) {
+                    fontSize -= 1;
+                    tx.font = 'bold ' + fontSize + 'px Georgia, serif';
+                }
+                if (tx.measureText(txt).width > maxTextW) {
+                    while (txt.length > 3 && tx.measureText(txt + '...').width > maxTextW) {
+                        txt = txt.substring(0, txt.length - 1);
+                    }
+                    txt = txt + '...';
+                }
+                tx.fillText(txt, tc.width / 2, tc.height / 2);
                 var tm = new THREE.Mesh(
-                    new THREE.PlaneGeometry(0.9, 0.14),
+                    new THREE.PlaneGeometry(1.5, 0.22),
                     new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(tc), side: THREE.DoubleSide, transparent: true })
                 );
-                tm.position.set(xPos + faceDir * 0.04, yPos - ih / 2 - 0.26, zPos);
+                tm.position.set(xPos + faceDir * 0.04, yPos - ih / 2 - 0.32, zPos);
                 tm.rotation.y = rotY;
                 self.scene.add(tm);
             }
 
             if (art.image) {
                 self._loadImg(art.image, parts.mat);
+            }
+
+            if (art.audio) {
+                var audioEl = document.createElement('audio');
+                audioEl.preload = 'auto';
+                audioEl.src = art.audio;
+                audioEl.volume = 0.85;
+                self.audioSlots.push({
+                    el: audioEl,
+                    zPos: zPos,
+                    xPos: xPos,
+                    playing: false,
+                    lastToggle: 0
+                });
             }
         });
 
@@ -824,6 +858,20 @@ I.prototype = {
         var lookTouchId = null, lookStartX = 0, lookStartY = 0;
         var stickTouchId = null;
 
+        function isTouchOnInteractive(evt) {
+            for (var i = 0; i < evt.changedTouches.length; i++) {
+                var t = evt.changedTouches[i];
+                var el = document.elementFromPoint(t.clientX, t.clientY);
+                while (el) {
+                    if (el.closest && (el.closest('.imm-ex') || el.closest('.rg-over') || el.closest('#rotarMsgWrap'))) {
+                        return true;
+                    }
+                    el = el.parentElement;
+                }
+            }
+            return false;
+        }
+
         var base = document.createElement('div');
         base.id = 'joystickBase';
         base.style.cssText = 'position:fixed;left:20px;bottom:30px;width:120px;height:120px;z-index:25;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:none;user-select:none;-webkit-user-select:none;';
@@ -834,6 +882,7 @@ I.prototype = {
         var radius = 35;
 
         function onStart(e) {
+            if (isTouchOnInteractive(e)) return;
             for (var i = 0; i < e.changedTouches.length; i++) {
                 var t = e.changedTouches[i];
                 var r = base.getBoundingClientRect();
@@ -849,6 +898,7 @@ I.prototype = {
             }
         }
         function onMove(e) {
+            if (isTouchOnInteractive(e)) return;
             for (var i = 0; i < e.changedTouches.length; i++) {
                 var t = e.changedTouches[i];
                 if (t.identifier === stickTouchId) {
@@ -956,6 +1006,35 @@ I.prototype = {
             if (ov) ov.classList.add('activo');
         }
 
+        var now = performance.now();
+        var proxThresh = 3.0;
+        var cooldown = 800;
+        var narracionActiva = false;
+        for (var a = 0; a < this.audioSlots.length; a++) {
+            var sl = this.audioSlots[a];
+            var dx = this.camera.position.x - sl.xPos;
+            var dz = this.camera.position.z - sl.zPos;
+            var dist = Math.sqrt(dx * dx + dz * dz);
+            if (dist < proxThresh && !sl.playing && (now - sl.lastToggle) > cooldown) {
+                sl.el.currentTime = 0;
+                sl.el.play().catch(function(){});
+                sl.playing = true;
+                sl.lastToggle = now;
+            } else if (dist >= proxThresh && sl.playing && (now - sl.lastToggle + 400) > cooldown) {
+                sl.el.pause();
+                sl.playing = false;
+                sl.lastToggle = now;
+            }
+            if (sl.playing) narracionActiva = true;
+        }
+        if (this._bgMusic) {
+            var targetVol = narracionActiva ? 0.03 : 0.12;
+            var currentVol = parseFloat(this._bgMusic.volume);
+            var newVol = currentVol + (targetVol - currentVol) * 0.05;
+            if (Math.abs(newVol - targetVol) < 0.001) newVol = targetVol;
+            this._bgMusic.volume = newVol;
+        }
+
         this.renderer.render(this.scene, this.camera);
     },
 
@@ -980,8 +1059,22 @@ I.prototype = {
         if (jb && jb.parentNode) jb.parentNode.removeChild(jb);
         var ov = document.getElementById('pointerLockOverlay');
         if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        var rw = document.getElementById('rotarMsgWrap');
+        if (rw && rw.parentNode) rw.parentNode.removeChild(rw);
         if (document.pointerLockElement && document.pointerLockElement === this.renderer.domElement) {
             document.exitPointerLock();
+        }
+        for (var a = 0; a < this.audioSlots.length; a++) {
+            var sl = this.audioSlots[a];
+            sl.el.pause();
+            sl.el.src = '';
+            sl.el.load();
+        }
+        this.audioSlots = [];
+        if (this._bgMusic) {
+            this._bgMusic.pause();
+            this._bgMusic.src = '';
+            this._bgMusic = null;
         }
         this.scene = null;
         this.renderer = null;

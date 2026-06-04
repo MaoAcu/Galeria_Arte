@@ -974,3 +974,34 @@
                 grid-template-columns: 1fr;
             }
         }
+
+.btn-audio-upload,
+.btn-audio-record {
+    background: rgba(201,169,110,0.15);
+    color: #c9a96e;
+    border: 1px solid rgba(201,169,110,0.3);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-audio-upload:hover,
+.btn-audio-record:hover {
+    background: rgba(201,169,110,0.25);
+}
+.btn-audio-record.recording {
+    background: rgba(239,68,68,0.2);
+    color: #ef4444;
+    border-color: rgba(239,68,68,0.4);
+}
+.audio-upload-container {
+    margin-top: 4px;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
